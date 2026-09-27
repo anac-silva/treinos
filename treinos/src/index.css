@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+@theme {
+  /* Cor principal da aplicação */
+  --color-principal: #620C1F;
+  --color-secundaria: #DA1234;
+  --color-detalhes-primaria: #FF6B61;
+  --color-detalhes-secundaria: #F53D3E;
+
+
+  /* Estrutura da aplicação */
+  --color-background: #FEEEE9;
+
+  /* Textos */
+  --color-texto-principal: #3D0918;
+  --color-texto-secundaria: #2F0811;
+
+  /* Estados */
+  --color-: #0FA853;
+}
