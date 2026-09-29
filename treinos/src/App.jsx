@@ -2,11 +2,7 @@ import './App.css'
 import Body from './components/body';
 
 function App() {
-  return (
-    <>
-      <Body/>
-    </>
-  )
+  return <Body/>
 }
 
 export default App;
