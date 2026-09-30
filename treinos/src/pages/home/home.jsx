@@ -24,8 +24,10 @@ function Home() {
       <section className="schedule-section">
         <div className="section-heading">
           <h2>Agenda da semana</h2>
-          <NavLink to="/agendamentos">Ver agenda completa</NavLink>
-          <FaArrowRightLong />
+          <NavLink to="/agendamentos" className="inline-flex items-center gap-2 whitespace-nowrap">
+            Ver agenda completa
+            <FaArrowRightLong aria-hidden="true" />
+          </NavLink>
         </div>
         <div className="day-label">Hoje <span>•</span> 15/09</div>
         <div className="appointment-row"><time>08:00</time><strong>Carlos Silva</strong><span className="appointment-type">Treino de membros inferiores</span><span className="status status-done">Concluído</span></div>

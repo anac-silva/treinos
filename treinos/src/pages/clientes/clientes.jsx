@@ -38,7 +38,14 @@ function Clientes() {
           ))}</tbody>
         </table>
       </section>
-      <footer className="table-footer"><span>Mostrando 1 a 8 de 32 clientes</span><div className="pagination"><button className="icon-button">‹</button><button className="page-number selected">1</button><button className="page-number">2</button><button className="page-number">3</button><button className="page-number">4</button><button className="icon-button">›</button></div></footer>
+      <footer className="table-footer">
+        <span>Mostrando 1 a 8 de 32 clientes</span>
+        <div className="pagination">
+          <button className="icon-button">‹</button>
+          <button className="page-number selected">1</button>
+          <button className="icon-button">›</button>
+        </div>
+      </footer>
     </main>
   );
 }

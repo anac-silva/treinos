@@ -102,8 +102,11 @@ function Agendamentos() {
             </label>
           </div>
           <footer className="appointment-modal-footer">
-            <button type="button" className="button button-primary" onClick={() => setModalAberto(false)}>
+            <button type="button" className="button appointment-modal-cancel" onClick={() => setModalAberto(false)}>
               Fechar
+            </button>
+            <button type="button" className="button button-primary" >
+              Salvar
             </button>
           </footer>
         </dialog>
