@@ -1,4 +1,5 @@
-import { FiCalendar, FiChevronLeft, FiChevronRight, FiFilter, FiMoreHorizontal, FiPlus } from "react-icons/fi";
+import { FiCalendar, FiChevronLeft, FiChevronRight, FiFilter, FiMoreHorizontal, FiPlus, FiX } from "react-icons/fi";
+import { useEffect, useRef, useState } from "react";
 
 const appointments = [
   ["08:00", "CS", "Carlos Silva", "Treino de membros inferiores", "Concluído", "status-done", "avatar-blue"],
@@ -16,9 +17,32 @@ const appointmentDays = [
 ];
 
 function Agendamentos() {
+  const [modalAberto, setModalAberto] = useState(false);
+  const modalRef = useRef(null);
+
+  useEffect(() => {
+    if (!modalAberto) return;
+
+    const modal = modalRef.current;
+    const previousOverflow = document.body.style.overflow;
+    modal.showModal();
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      modal.close();
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [modalAberto]);
+
   return (
     <main className="workspace">
-      <header className="page-heading"><div><h1>Agendamentos</h1><p>Visualize e gerencie todos os seus atendimentos.</p></div><button className="button button-primary"><FiPlus /> Novo agendamento</button></header>
+      <header className="page-heading">
+        <div>
+          <h1>Agendamentos</h1>
+          <p>Visualize e gerencie todos os seus atendimentos.</p>
+        </div>
+        
+        <button className="button button-primary" onClick={() =>setModalAberto(true)}><FiPlus /> Novo agendamento</button></header>
       <div className="calendar-toolbar">
         <button className="button button-outline current-week">Semana atual <FiCalendar /></button>
         <button className="icon-button square-button"><FiChevronLeft /></button><button className="icon-button square-button"><FiChevronRight /></button>
@@ -39,6 +63,51 @@ function Agendamentos() {
           </table>
         </div>
       </section>)}
+
+      {modalAberto && (
+        <dialog
+          ref={modalRef}
+          className="appointment-modal"
+          aria-labelledby="appointment-modal-title"
+          onCancel={() => setModalAberto(false)}
+        >
+          <header className="appointment-modal-heading">
+            <span className="appointment-modal-icon"><FiCalendar aria-hidden="true" /></span>
+            <h2 id="appointment-modal-title">Novo agendamento</h2>
+            <button
+              type="button"
+              className="icon-button appointment-modal-close"
+              aria-label="Fechar modal"
+              onClick={() => setModalAberto(false)}
+            >
+              <FiX aria-hidden="true" />
+            </button>
+          </header>
+          <div className="appointment-modal-fields">
+            <label className="field appointment-modal-full-field">
+              Nome do cliente
+              <input type="text" name="cliente" placeholder="Digite o nome do cliente" />
+            </label>
+            <label className="field">
+              Data
+              <input type="date" name="data" />
+            </label>
+            <label className="field">
+              Horário
+              <input type="time" name="horario" />
+            </label>
+            <label className="field appointment-modal-full-field">
+              Assunto
+              <textarea name="assunto" placeholder="Ex: Avaliação física ou treino de membros inferiores" rows="3" />
+            </label>
+          </div>
+          <footer className="appointment-modal-footer">
+            <button type="button" className="button button-primary" onClick={() => setModalAberto(false)}>
+              Fechar
+            </button>
+          </footer>
+        </dialog>
+      )}
     </main>
   );
 }
