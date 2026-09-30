@@ -1,9 +1,12 @@
 import { FiArrowLeft, FiCamera } from "react-icons/fi";
+import { NavLink } from "react-router-dom";
 
 function NovoCliente() {
   return (
     <main className="workspace">
-      <div className="back-link"><FiArrowLeft /> Voltar para Clientes</div>
+      <NavLink to="/clientes" className="back-link">
+        <FiArrowLeft aria-hidden="true" /> Voltar para Clientes
+      </NavLink>
       <header className="new-client-heading"><div><h1>Novo Cliente</h1><p>Preencha os dados para cadastrar um novo aluno.</p></div><div className="photo-upload"><FiCamera /><span>Adicionar foto</span></div></header>
       <form className="form-layout">
         <label className="field full-field">Nome completo <b>*</b><input placeholder="Ex: João da Silva" /></label>

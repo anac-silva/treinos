@@ -1,4 +1,5 @@
 import { FiFilter, FiMoreHorizontal, FiPlus, FiSearch } from "react-icons/fi";
+import { NavLink } from "react-router-dom";
 
 const clients = [
   ["MS", "Marina Silva", "Emagrecimento", "12/09/2026", "Ativo", "avatar-rose"],
@@ -16,7 +17,9 @@ function Clientes() {
     <main className="workspace clients-page">
       <header className="page-heading">
         <div><h1>Clientes</h1><p>Gerencie seus alunos e acompanhe a evolução.</p></div>
-        <button className="button button-primary"><FiPlus /> Novo cliente</button>
+        <NavLink to="/clientes/novocliente" className="button button-primary">
+          <FiPlus aria-hidden="true" /> Novo cliente
+        </NavLink>
       </header>
       <div className="toolbar">
         <label className="search-field"><FiSearch /><input placeholder="Buscar por nome, objetivo ou status..." /></label>

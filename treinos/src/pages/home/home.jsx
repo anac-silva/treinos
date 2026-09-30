@@ -2,6 +2,7 @@ import { IoPeopleCircleOutline } from "react-icons/io5";
 import { FaCalendarAlt } from "react-icons/fa";
 import { FaArrowRightLong } from "react-icons/fa6";
 import { BsLightningCharge } from "react-icons/bs";
+import { NavLink } from "react-router-dom";
 
 function Home() {
   return (
@@ -21,7 +22,11 @@ function Home() {
       </section>
 
       <section className="schedule-section">
-        <div className="section-heading"><h2>Agenda da semana</h2><span className="text-action">Ver agenda completa <FaArrowRightLong /></span></div>
+        <div className="section-heading">
+          <h2>Agenda da semana</h2>
+          <NavLink to="/agendamentos">Ver agenda completa</NavLink>
+          <FaArrowRightLong />
+        </div>
         <div className="day-label">Hoje <span>•</span> 15/09</div>
         <div className="appointment-row"><time>08:00</time><strong>Carlos Silva</strong><span className="appointment-type">Treino de membros inferiores</span><span className="status status-done">Concluído</span></div>
         <div className="appointment-row"><time>09:00</time><strong>Marina Costa</strong><span className="appointment-type">Avaliação física</span><span className="status status-progress">Em andamento</span></div>
