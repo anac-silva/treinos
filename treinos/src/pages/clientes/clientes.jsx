@@ -13,7 +13,7 @@ const clients = [
 
 function Clientes() {
   return (
-    <main className="workspace">
+    <main className="workspace clients-page">
       <header className="page-heading">
         <div><h1>Clientes</h1><p>Gerencie seus alunos e acompanhe a evolução.</p></div>
         <button className="button button-primary"><FiPlus /> Novo cliente</button>

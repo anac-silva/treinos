@@ -10,6 +10,11 @@ const appointments = [
   ["10:00", "LS", "Lucas Santos", "Avaliação física", "Agendado", "status-booked", "avatar-amber"],
 ];
 
+const appointmentDays = [
+  { label: "Hoje", date: "15/09", appointments: appointments.slice(0, 4) },
+  { label: "Amanhã", date: "16/09", appointments: appointments.slice(4) },
+];
+
 function Agendamentos() {
   return (
     <main className="workspace">
@@ -21,16 +26,19 @@ function Agendamentos() {
         <button className="button button-outline"><FiFilter /> Filtros</button>
       </div>
       <div className="view-tabs"><div className="view-tab selected">Lista</div><div className="view-tab">Semana</div><div className="view-tab">Dia</div></div>
-      <section className="table-wrap">
-        <table className="data-table schedule-table">
-          <thead><tr><th>Data</th><th>Horário</th><th>Cliente</th><th>Tipo de atendimento</th><th>Status</th><th>Ações</th></tr></thead>
-          <tbody>
-            {appointments.map(([time, initials, name, type, status, statusClass, avatar], index) => <tr key={`${time}-${name}`}>
-              <td>{index === 0 || index === 4 ? <span className="calendar-mini"><FiCalendar /></span> : ""}</td><td>{time}</td><td><span className={`avatar avatar-small ${avatar}`}>{initials}</span><strong>{name}</strong></td><td className="muted-cell">{type}</td><td><span className={`status ${statusClass}`}>{status}</span></td><td><button className="icon-button"><FiMoreHorizontal /></button></td>
-            </tr>)}
-          </tbody>
-        </table>
-      </section>
+      {appointmentDays.map(({ label, date, appointments: dayAppointments }) => <section className="schedule-day" key={label}>
+        <div className="day-label schedule-day-label">{label} <span>•</span> {date}</div>
+        <div className="table-wrap">
+          <table className="data-table schedule-table">
+            <thead><tr><th>Horário</th><th>Cliente</th><th>Tipo de atendimento</th><th>Status</th><th>Ações</th></tr></thead>
+            <tbody>
+              {dayAppointments.map(([time, initials, name, type, status, statusClass, avatar]) => <tr key={`${time}-${name}`}>
+                <td>{time}</td><td><span className={`avatar avatar-small ${avatar}`}>{initials}</span><strong>{name}</strong></td><td className="muted-cell">{type}</td><td><span className={`status ${statusClass}`}>{status}</span></td><td><button className="icon-button"><FiMoreHorizontal /></button></td>
+              </tr>)}
+            </tbody>
+          </table>
+        </div>
+      </section>)}
     </main>
   );
 }
