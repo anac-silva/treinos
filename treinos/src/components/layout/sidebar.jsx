@@ -24,9 +24,11 @@ export function Sidebar() {
                     <FaRegCalendarCheck />
                     <span>Agendamentos</span>
                 </NavLink>
+                <NavLink to="/configuracoes" className="sidebar-link">
+                    <FiSettings /><span>Configurações</span>
+                </NavLink>
            </nav>
            <div className="sidebar-bottom">
-                <div className="sidebar-link"><FiSettings /><span>Configurações</span></div>
                 <div className="trainer-profile">
                     <div className="avatar avatar-trainer">L</div>
                     <div><strong>Leonardo</strong><span>Personal Trainer</span></div>

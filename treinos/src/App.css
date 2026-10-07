@@ -20,6 +20,25 @@
 body { margin: 0; min-width: 320px; min-height: 100vh; }
 button, input, select, textarea { font: inherit; }
 button { cursor: default; }
+button:disabled { opacity: .5; cursor: not-allowed; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.settings-section { margin-bottom: 24px; padding: 22px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }
+.settings-section .section-heading p { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+.settings-count { color: var(--muted); white-space: nowrap; font-size: 12px; }
+.catalog-form { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; margin-bottom: 18px; }
+.catalog-form .field { flex: 1; min-width: 0; }
+.catalog-form .catalog-unit { flex: 0 1 170px; }
+.catalog-form button { cursor: pointer; }
+.catalog-search { margin-bottom: 12px; }
+.catalog-message, .catalog-empty { margin: 12px 0; font-size: 13px; }
+.catalog-error { color: #a20d2b; }
+.catalog-success { color: #087547; }
+.catalog-empty { color: var(--muted); }
+.settings-links { display: flex; flex-wrap: wrap; gap: 12px; }
+.settings-links a { text-decoration: none; }
+.profile-tab { text-decoration: none; }
+.selected-exercises input { width: 90px; padding: 6px; border: 1px solid var(--line); border-radius: 5px; }
+.settings-page input:focus-visible, .settings-page button:focus-visible, .settings-page a:focus-visible, .exercise-selection select:focus-visible, .exercise-selection input:focus-visible, .exercise-selection button:focus-visible, .measure-field input:focus-visible { outline: 2px solid var(--wine); outline-offset: 2px; }
 .app-layout { display: flex; min-height: 100vh; overflow: hidden; background: var(--paper); }
 .sidebar { display: flex; flex: 0 0 226px; flex-direction: column; min-height: 100vh; padding: 20px 12px 14px; color: white; background: linear-gradient(155deg, #4c091b, #600b22 55%, #430817); }
 .sidebar-brand { display: flex; align-items: center; justify-content: center; height: 66px; margin-bottom: 20px; }
@@ -264,7 +283,12 @@ button { cursor: default; }
 	.app-layout { display: flex; flex-direction: column; margin: 0; border: 0; border-radius: 0; }
 	.sidebar { flex-basis: auto; min-height: 0; padding: 8px 12px; }
 	.sidebar-brand, .sidebar-bottom { display: none; }
-	.sidebar-nav { grid-template-columns: repeat(3, 1fr); gap: 5px; }
+	.sidebar-nav { grid-template-columns: repeat(2, 1fr); gap: 5px; }
+	.settings-section { padding: 16px; }
+	.settings-section .section-heading { align-items: flex-start; flex-direction: column; gap: 8px; }
+	.catalog-form { flex-direction: column; align-items: stretch; }
+	.catalog-form .catalog-unit { flex: auto; }
+	.settings-links .button { white-space: normal; text-align: center; }
 	.sidebar-link { justify-content: center; gap: 7px; min-height: 39px; padding: 0 6px; font-size: 12px; }
 	.workspace { padding: 22px 17px; }
 	.clients-page { min-height: 0; }
