@@ -1,0 +1,134 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                 String    @id @default(uuid()) @db.Uuid
+  singleton          Int       @unique @default(1) @db.SmallInt
+  name               String    @db.VarChar(100)
+  email              String    @unique @db.VarChar(254)
+  passwordHash       String
+  mustChangePassword Boolean   @default(true)
+  active             Boolean   @default(true)
+  createdAt          DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt          DateTime  @updatedAt @db.Timestamptz(3)
+  lastLoginAt        DateTime? @db.Timestamptz(3)
+  sessions           Session[]
+  corrections        AssessmentCorrection[]
+}
+
+enum ClientStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model Client {
+  id              String       @id @default(uuid()) @db.Uuid
+  name            String       @db.VarChar(100)
+  age             Int?
+  email           String?      @db.VarChar(254)
+  phone           String?      @db.VarChar(40)
+  goal            String?      @db.VarChar(100)
+  experienceLevel String?      @db.VarChar(50)
+  notes           String?
+  status          ClientStatus @default(ACTIVE)
+  createdAt       DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime     @updatedAt @db.Timestamptz(3)
+  assessments     Assessment[]
+  photos          ClientPhoto[]
+
+  @@index([status, name])
+}
+
+model MeasurementType {
+  id           String                  @id @default(uuid()) @db.Uuid
+  name         String                  @db.VarChar(100)
+  nameKey      String                  @unique @db.VarChar(100)
+  unit         String                  @db.VarChar(20)
+  active       Boolean                 @default(true)
+  createdAt    DateTime                @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime                @updatedAt @db.Timestamptz(3)
+  measurements AssessmentMeasurement[]
+}
+
+model Assessment {
+  id               String                  @id @default(uuid()) @db.Uuid
+  clientId         String                  @db.Uuid
+  client           Client                  @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  assessedOn       DateTime                @db.Date
+  weightKg         Decimal                 @db.Decimal(7, 3)
+  heightCm         Decimal?                @db.Decimal(6, 2)
+  bodyFatPercent   Decimal?                @db.Decimal(5, 2)
+  notes            String?
+  nextAssessmentOn DateTime?               @db.Date
+  version          Int                     @default(1)
+  createdAt        DateTime                @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime                @updatedAt @db.Timestamptz(3)
+  measurements     AssessmentMeasurement[]
+  corrections      AssessmentCorrection[]
+
+  @@index([clientId, assessedOn, createdAt])
+}
+
+model AssessmentMeasurement {
+  id            String          @id @default(uuid()) @db.Uuid
+  assessmentId  String          @db.Uuid
+  assessment    Assessment      @relation(fields: [assessmentId], references: [id], onDelete: Restrict)
+  typeId        String          @db.Uuid
+  type          MeasurementType @relation(fields: [typeId], references: [id], onDelete: Restrict)
+  typeName      String          @db.VarChar(100)
+  unit          String          @db.VarChar(20)
+  value         Decimal         @db.Decimal(10, 3)
+
+  @@unique([assessmentId, typeId])
+  @@index([typeId, assessmentId])
+}
+
+model AssessmentCorrection {
+  id           String     @id @default(uuid()) @db.Uuid
+  assessmentId String     @db.Uuid
+  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Restrict)
+  actorId      String     @db.Uuid
+  actor        User       @relation(fields: [actorId], references: [id], onDelete: Restrict)
+  reason       String     @db.VarChar(500)
+  version      Int
+  before       Json
+  after        Json
+  createdAt    DateTime   @default(now()) @db.Timestamptz(3)
+
+  @@unique([assessmentId, version])
+}
+
+model ClientPhoto {
+  id         String   @id @default(uuid()) @db.Uuid
+  clientId   String   @db.Uuid
+  client     Client   @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  storageKey String   @unique
+  mimeType   String   @db.VarChar(50)
+  sizeBytes  Int
+  principal  Boolean  @default(true)
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @db.Timestamptz(3)
+
+  @@index([clientId, principal])
+}
+
+model Session {
+  id            String    @id @default(uuid()) @db.Uuid
+  tokenHash     String    @unique @db.Char(64)
+  csrfTokenHash String    @db.Char(64)
+  userId        String    @db.Uuid
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt     DateTime  @default(now()) @db.Timestamptz(3)
+  expiresAt     DateTime  @db.Timestamptz(3)
+  revokedAt     DateTime? @db.Timestamptz(3)
+
+  @@index([userId, revokedAt])
+  @@index([expiresAt])
+}

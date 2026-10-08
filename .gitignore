@@ -1,0 +1,8 @@
+node_modules/
+.env
+.env.*
+!.env.example
+backend/dist/
+backend/src/generated/
+backend/coverage/
+backend/.test-postgres/
