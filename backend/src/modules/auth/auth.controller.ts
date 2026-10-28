@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Inject, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, HttpCode, Inject, Post, Req, Res } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { Response } from 'express';
 import { APP_CONFIG, AppConfig } from '../../shared/config';
@@ -24,6 +24,17 @@ export class AuthController {
   @Throttle({ default: { limit: 5, ttl: 60_000 } })
   async login(@Body() body: LoginDto, @Res({ passthrough: true }) response: Response) {
     return this.respond(response, await this.auth.login(body.email, body.password));
+  }
+
+  @Public()
+  @Post('local')
+  @HttpCode(200)
+  async localLogin(@Req() request: AuthRequest, @Res({ passthrough: true }) response: Response) {
+    if (!this.config.localAuthBypass || !['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(request.socket.remoteAddress || '')) {
+      throw new ForbiddenException('O acesso sem senha só está disponível no computador local.');
+    }
+    const cookies = request.cookies as Record<string, string> | undefined;
+    return this.respond(response, await this.auth.localLogin(cookies?.[this.config.cookieName]));
   }
 
   @AllowPasswordChange()

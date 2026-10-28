@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, OnModuleInit, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Inject, Injectable, OnModuleInit, ServiceUnavailableException, UnauthorizedException } from '@nestjs/common';
 import { createHash, createHmac, randomBytes } from 'node:crypto';
 import { PrismaService } from '../../shared/database/prisma.service';
 import { APP_CONFIG, AppConfig } from '../../shared/config';
@@ -37,6 +37,24 @@ export class AuthService implements OnModuleInit {
       await tx.session.updateMany({ where: { userId: user.id, revokedAt: null }, data: { revokedAt: new Date() } });
       await tx.session.create({ data: next.data });
       return latest;
+    });
+    return { user: publicUser(updated), token: next.token, csrfToken: next.csrfToken, expiresAt: next.data.expiresAt };
+  }
+
+  async localLogin(token?: string) {
+    if (!this.config.localAuthBypass) throw new ForbiddenException('O acesso local sem senha não está habilitado.');
+    const user = await this.database.user.findUnique({ where: { singleton: 1 } });
+    if (!user?.active) throw new ServiceUnavailableException('Nenhum personal ativo está configurado no banco.');
+    if (token && /^[a-f0-9]{64}$/.test(token)) {
+      const session = await this.database.session.findUnique({ where: { tokenHash: tokenHash(token) } });
+      if (session?.userId === user.id && !session.revokedAt && session.expiresAt > new Date()) {
+        return { user: publicUser(user), token, csrfToken: csrfForSession(token), expiresAt: session.expiresAt };
+      }
+    }
+    const next = this.newSession(user.id);
+    const updated = await this.database.$transaction(async (tx) => {
+      await tx.session.create({ data: next.data });
+      return tx.user.findUniqueOrThrow({ where: { id: user.id } });
     });
     return { user: publicUser(updated), token: next.token, csrfToken: next.csrfToken, expiresAt: next.data.expiresAt };
   }

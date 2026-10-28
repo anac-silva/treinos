@@ -13,8 +13,8 @@ export default function ExerciseSelection({ prescription = false }) {
   const existingExercise = exercises.find(({ name }) => normalize(name) === normalize(query));
   const selectedExercise = options.find(({ name }) => normalize(name) === normalize(query));
 
-  function registerExercise() {
-    const error = register("exercises", { name: query });
+  async function registerExercise() {
+    const error = await register("exercises", { name: query });
     setMessage({ error: Boolean(error), text: error || "Exercício cadastrado em Configurações. Clique em Adicionar exercício para incluí-lo." });
   }
 

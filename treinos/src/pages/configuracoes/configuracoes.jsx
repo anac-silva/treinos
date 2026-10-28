@@ -9,13 +9,16 @@ function CatalogSection({ kind, title, description, withUnit = false }) {
   const [unit, setUnit] = useState("");
   const [query, setQuery] = useState("");
   const [message, setMessage] = useState(null);
+  const [busy, setBusy] = useState(false);
   const items = catalog[kind].filter((item) =>
     `${item.name} ${item.unit || ""}`.toLocaleLowerCase("pt-BR").includes(query.trim().toLocaleLowerCase("pt-BR"))
   );
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
-    const error = catalog.register(kind, { name, ...(withUnit ? { unit } : {}) });
+    setBusy(true);
+    const error = await catalog.register(kind, { name, ...(withUnit ? { unit } : {}) });
+    setBusy(false);
     setMessage({ error: Boolean(error), text: error || "Cadastro salvo com sucesso." });
     if (!error) { setName(""); setUnit(""); }
   }
@@ -30,13 +33,15 @@ function CatalogSection({ kind, title, description, withUnit = false }) {
         {withUnit && <label className="field catalog-unit">Unidade de medida
           <input required maxLength={20} value={unit} onChange={(event) => setUnit(event.target.value)} placeholder="Ex: cm, kg, %, mm" />
         </label>}
-        <button type="submit" className="button button-primary button-dark"><FiPlus aria-hidden="true" /> Cadastrar</button>
+        <button type="submit" disabled={busy} className="button button-primary button-dark"><FiPlus aria-hidden="true" /> {busy ? 'Salvando…' : 'Cadastrar'}</button>
       </form>
       {message && <p className={`catalog-message ${message.error ? "catalog-error" : "catalog-success"}`} role={message.error ? "alert" : "status"}>{message.text}</p>}
       <label className="search-field catalog-search"><FiSearch aria-hidden="true" /><span className="sr-only">Buscar em {title}</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={`Buscar ${title.toLocaleLowerCase("pt-BR")}...`} /></label>
-      <div className="table-wrap"><table className="data-table"><thead><tr><th scope="col">Nome</th>{withUnit && <th scope="col">Unidade de medida</th>}</tr></thead>
-        <tbody>{items.map((item) => <tr key={item.id}><td>{item.name}</td>{withUnit && <td>{item.unit}</td>}</tr>)}
-          {!items.length && <tr><td colSpan={withUnit ? 2 : 1}>Nenhum cadastro encontrado.</td></tr>}
+      {withUnit && catalog.loading && <p role="status">Carregando medições…</p>}
+      {withUnit && catalog.error && <p role="alert">{catalog.error} <button type="button" onClick={catalog.reload}>Tentar novamente</button></p>}
+      <div className="table-wrap"><table className="data-table"><thead><tr><th scope="col">Nome</th>{withUnit && <><th scope="col">Unidade de medida</th><th>Ações</th></>}</tr></thead>
+        <tbody>{items.map((item) => <tr key={item.id}><td>{item.name}</td>{withUnit && <><td>{item.unit}</td><td><MeasurementActions item={item} /></td></>}</tr>)}
+          {!items.length && <tr><td colSpan={withUnit ? 3 : 1}>Nenhum cadastro encontrado.</td></tr>}
         </tbody></table></div>
     </section>
   );
@@ -46,10 +51,22 @@ export default function Configuracoes() {
   return (
     <main className="workspace settings-page">
       <header className="page-heading"><div><h1>Configurações</h1><p>Organize os exercícios e as medições usados nos atendimentos.</p></div></header>
-      <p className="notice-banner">Os cadastros ficam salvos neste navegador nesta versão. A sincronização com o servidor será integrada ao back-end.</p>
+      <p className="notice-banner">Medições são salvas no servidor. Exercícios permanecem neste navegador enquanto o módulo de treinos aguarda implementação.</p>
       <CatalogSection kind="exercises" title="Exercícios" description="Cadastre os exercícios disponíveis para seleção." />
       <CatalogSection kind="measurements" title="Medições" description="Defina o que será medido e a unidade de cada medição." withUnit />
-      <div className="settings-links"><Link className="button button-outline" to="/clientes/novaavaliacao">Abrir avaliação de demonstração</Link><Link className="button button-outline" to="/clientes/treinos">Abrir montagem de treino de demonstração</Link></div>
+      <div className="settings-links"><Link className="button button-outline" to="/clientes">Selecionar cliente para avaliação</Link></div>
     </main>
   );
+}
+
+function MeasurementActions({ item }) {
+  const { updateMeasurement } = useCatalog();
+  const [editing, setEditing] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  async function save(body) {
+    setBusy(true); setError('');
+    try { await updateMeasurement(item.id, body); setEditing(false); } catch (error) { setError(error.message); } finally { setBusy(false); }
+  }
+  return <>{editing ? <form onSubmit={(event) => { event.preventDefault(); save(Object.fromEntries(new FormData(event.currentTarget))); }} className="catalog-form"><label className="field">Nome<input name="name" required maxLength={100} defaultValue={item.name} /></label><label className="field">Unidade<input name="unit" required maxLength={20} defaultValue={item.unit} /></label><button disabled={busy}>Salvar</button><button type="button" disabled={busy} onClick={() => setEditing(false)}>Cancelar</button></form> : <><button type="button" disabled={busy} onClick={() => setEditing(true)}>Editar</button> <button type="button" disabled={busy} onClick={() => save({ active: !item.active })}>{item.active ? 'Arquivar' : 'Reativar'}</button></>}{error && <p role="alert">{error}</p>}</>;
 }

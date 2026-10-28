@@ -6,6 +6,9 @@ export const APP_CONFIG = Symbol('APP_CONFIG');
 export function readConfig(env: NodeJS.ProcessEnv = process.env) {
   const production = env.NODE_ENV === 'production';
   if (!['development', 'test', 'production'].includes(env.NODE_ENV || 'development')) throw new Error('NODE_ENV inválido.');
+  if (env.LOCAL_AUTH_BYPASS !== undefined && !['true', 'false'].includes(env.LOCAL_AUTH_BYPASS)) throw new Error('LOCAL_AUTH_BYPASS deve ser true ou false.');
+  const localAuthBypass = env.LOCAL_AUTH_BYPASS === 'true';
+  if (localAuthBypass && (production || env.NODE_ENV === 'test')) throw new Error('LOCAL_AUTH_BYPASS só pode ser usado em desenvolvimento local.');
   if (!env.DATABASE_URL || !/^postgres(ql)?:\/\//.test(env.DATABASE_URL)) throw new Error('Configure DATABASE_URL para PostgreSQL.');
   const origins = (env.CORS_ORIGINS || '').split(',').map((value) => value.trim()).filter(Boolean);
   if (!origins.length) throw new Error('Configure CORS_ORIGINS explicitamente.');
@@ -19,7 +22,7 @@ export function readConfig(env: NodeJS.ProcessEnv = process.env) {
   if (!Number.isInteger(sessionTtlHours) || sessionTtlHours < 1 || sessionTtlHours > 168) throw new Error('SESSION_TTL_HOURS deve estar entre 1 e 168.');
   const trustProxy = env.TRUST_PROXY || 'false';
   if (trustProxy === 'true') throw new Error('TRUST_PROXY deve ser false ou uma lista explícita de proxies/IPs confiáveis.');
-  return { production, port, origins, sessionTtlHours, databaseUrl: env.DATABASE_URL,
+  return { production, localAuthBypass, port, origins, sessionTtlHours, databaseUrl: env.DATABASE_URL,
     cookieName: production ? '__Host-personal_session' : 'personal_session',
     trustProxy: trustProxy === 'false' ? false as const : trustProxy.split(',').map((value) => value.trim()),
   };

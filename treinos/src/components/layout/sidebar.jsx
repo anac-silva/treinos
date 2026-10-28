@@ -4,8 +4,18 @@ import { FaRegCalendarCheck } from "react-icons/fa";
 import { FiSettings } from "react-icons/fi";
 import logo from "../../assets/logo-removebg-preview.png";
 import { NavLink } from "react-router-dom";
+import { useAuth } from '../../contexts/authContext';
+import { localAuthBypass } from '../../lib/api';
+import { useState } from 'react';
 
 export function Sidebar() {
+    const { user, logout } = useAuth();
+    const [error, setError] = useState('');
+    const [busy, setBusy] = useState(false);
+    async function leave() {
+        setBusy(true); setError('');
+        try { await logout(); } catch (error) { setError(error.message); } finally { setBusy(false); }
+    }
     return (
         <aside className="sidebar">
            <div className="sidebar-brand">
@@ -30,9 +40,13 @@ export function Sidebar() {
            </nav>
            <div className="sidebar-bottom">
                 <div className="trainer-profile">
-                    <div className="avatar avatar-trainer">L</div>
-                    <div><strong>Leonardo</strong><span>Personal Trainer</span></div>
+                    <div className="avatar avatar-trainer">{user?.name?.slice(0, 1)}</div>
+                    <div><strong>{user?.name}</strong><span>Personal Trainer</span></div>
                 </div>
+                {!localAuthBypass && <><NavLink to="/alterar-senha" className="sidebar-link">Alterar senha</NavLink>
+                <button onClick={leave} disabled={busy} className="button button-outline">Sair</button></>}
+                {localAuthBypass && <p className="sidebar-link">Acesso local sem senha</p>}
+                {error && <p role="alert">{error}</p>}
            </div>
         </aside>
     )

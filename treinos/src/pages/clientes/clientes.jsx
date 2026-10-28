@@ -1,53 +1,23 @@
-import { FiFilter, FiMoreHorizontal, FiPlus, FiSearch } from "react-icons/fi";
-import { NavLink } from "react-router-dom";
-
-const clients = [
-  ["MS", "Marina Silva", "Emagrecimento", "12/09/2026", "Ativo", "avatar-rose"],
-  ["JP", "João Pereira", "Hipertrofia", "11/09/2026", "Ativo", "avatar-blue"],
-  ["AC", "Ana Clara", "Condicionamento", "10/09/2026", "Ativo", "avatar-green"],
-  ["RA", "Ricardo Almeida", "Qualidade de vida", "10/09/2026", "Ativo", "avatar-violet"],
-  ["LS", "Lucas Santos", "Performance", "09/09/2026", "Ativo", "avatar-amber"],
-  ["FL", "Fernanda Lima", "Emagrecimento", "08/09/2026", "Ativo", "avatar-coral"],
-  ["GR", "Gabriel Rocha", "Hipertrofia", "07/09/2026", "Ativo", "avatar-blue"],
-  ["TS", "Tatiane Souza", "Condicionamento", "06/09/2026", "Inativo", "avatar-dark"],
-];
-
-function Clientes() {
-  return (
-    <main className="workspace clients-page">
-      <header className="page-heading">
-        <div><h1>Clientes</h1><p>Gerencie seus alunos e acompanhe a evolução.</p></div>
-        <NavLink to="/clientes/novocliente" className="button button-primary">
-          <FiPlus aria-hidden="true" /> Novo cliente
-        </NavLink>
-      </header>
-      <div className="toolbar">
-        <label className="search-field"><FiSearch /><input placeholder="Buscar por nome, objetivo ou status..." /></label>
-        <button className="button button-outline"><FiFilter /> Filtros</button>
-      </div>
-      <section className="table-wrap">
-        <table className="data-table clients-table">
-          <thead><tr><th>Nome</th><th>Objetivo</th><th>Último treino</th><th>Status</th><th>Ações</th></tr></thead>
-          <tbody>{clients.map(([initials, name, goal, date, status, avatar]) => (
-            <tr key={name}>
-              <td><span className={`avatar ${avatar}`}>{initials}</span><strong>{name}</strong></td>
-              <td className="muted-cell">{goal}</td><td>{date}</td>
-              <td><span className={`status ${status === "Ativo" ? "status-done" : "status-pending"}`}>{status}</span></td>
-              <td><button className="icon-button" aria-label={`Ações para ${name}`}><FiMoreHorizontal /></button></td>
-            </tr>
-          ))}</tbody>
-        </table>
-      </section>
-      <footer className="table-footer">
-        <span>Mostrando 1 a 8 de 32 clientes</span>
-        <div className="pagination">
-          <button className="icon-button">‹</button>
-          <button className="page-number selected">1</button>
-          <button className="icon-button">›</button>
-        </div>
-      </footer>
-    </main>
-  );
+﻿import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useRemote } from '../../lib/useRemote';
+function Results({ path, page, setPage }) {
+  const { data, error, loading } = useRemote(path);
+  if (loading) return <p role="status">Carregando clientes…</p>;
+  if (error) return <p role="alert" className="catalog-error">{error}</p>;
+  return <><div className="table-wrap"><table className="data-table"><thead><tr><th>Nome</th><th>Objetivo</th><th>Status</th><th>Ações</th></tr></thead><tbody>
+    {data.items.map((client) => <tr key={client.id}><td><Link to={'/clientes/' + client.id + '/visaogeral'}>{client.name}</Link></td><td>{client.goal || '—'}</td><td>{client.status === 'ACTIVE' ? 'Ativo' : 'Inativo'}</td><td><Link to={'/clientes/' + client.id + '/editar'}>Editar</Link></td></tr>)}
+    {!data.items.length && <tr><td colSpan="4">Nenhum cliente encontrado.</td></tr>}
+  </tbody></table></div><footer className="table-footer"><span>{data.total} clientes · Página {page}</span><div className="pagination"><button disabled={page === 1} onClick={() => setPage(page - 1)}>Anterior</button><button disabled={page * data.pageSize >= data.total} onClick={() => setPage(page + 1)}>Próxima</button></div></footer></>;
 }
-
-export default Clientes;
+export default function Clientes() {
+  const [filters, setFilters] = useState({ q: '', status: '', goal: '' });
+  const [page, setPage] = useState(1);
+  const params = new URLSearchParams({ page: String(page), pageSize: '20', ...Object.fromEntries(Object.entries(filters).filter(([, value]) => value)) });
+  const path = '/clients?' + params;
+  function search(event) { event.preventDefault(); setFilters(Object.fromEntries(new FormData(event.currentTarget))); setPage(1); }
+  return <main className="workspace"><header className="page-heading"><div><h1>Clientes</h1><p>Gerencie seus alunos e acompanhe a evolução.</p></div><Link className="button button-primary" to="/clientes/novocliente">Novo cliente</Link></header>
+    <form onSubmit={search} className="toolbar"><label className="field">Nome, e-mail ou telefone<input name="q" type="search" /></label><label className="field">Objetivo<input name="goal" /></label><label className="field">Status<select name="status"><option value="">Todos</option><option value="ACTIVE">Ativo</option><option value="INACTIVE">Inativo</option></select></label><button className="button button-outline">Buscar</button></form>
+    <Results key={path} path={path} page={page} setPage={setPage} />
+  </main>;
+}

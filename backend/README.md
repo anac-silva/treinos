@@ -1,5 +1,17 @@
 # API do personal trainer
 
+> Banco local configurado: instância exclusiva em localhost:5433, banco
+> `treinos` e banco de testes `treinos_test`. Migrations e seed aplicados;
+> 17 testes HTTP com PostgreSQL real passaram. Consulte
+> [banco local](../docs/banco-local.md) para iniciar e acessar o sistema.
+
+> Atualização de integração: o front agora usa esta API para sessão,
+> clientes, catálogo de medições, avaliações, correções, evolução e fotos.
+> A configuração local está descrita no guia de banco acima.
+> Veja [o README do front](../treinos/README.md) para executar e testar as telas.
+> As observações antigas abaixo sobre ausência de integração descrevem a fase
+> anterior. Os contratos HTTP continuam sem prefixo `/api`; o Vite faz o proxy.
+
 Monólito modular em NestJS 11, TypeScript e Prisma 7 com PostgreSQL. Implementa
 autenticação, clientes, avaliações, medições e fotos; não modifica o front.
 Não há cadastro público, contas de clientes ou endpoint de criação de usuários.
@@ -83,6 +95,9 @@ npm start
 A API escuta na PORT configurada (padrão 3000). Endpoints nesta fase ficam na
 raiz, como `/auth/login`, conforme o pedido; ainda não há integração ou proxy
 `/api` no front.
+Em desenvolvimento local, `LOCAL_AUTH_BYPASS=true` habilita acesso sem senha
+e limita a API a `127.0.0.1`; mantenha esse modo desligado em produção e em
+qualquer ambiente acessível por outras pessoas.
 
 ## Contrato de autenticação
 

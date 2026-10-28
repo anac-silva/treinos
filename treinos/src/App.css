@@ -324,3 +324,10 @@ button:disabled { opacity: .5; cursor: not-allowed; }
 	.exercise-row { grid-template-columns: 20px minmax(100px, 1.5fr) repeat(3, minmax(44px, .7fr)) 24px; gap: 4px; padding: 3px; font-size: 10px; }
 	.exercise-row input { height: 26px; padding: 0 4px; font-size: 10px; }
 }
+/* Integração dos formulários e estados remotos. */
+.auth-page { max-width: 560px; margin: 40px auto; }
+.full-field { grid-column: 1 / -1; }
+.client-photo { width: 160px; height: 160px; object-fit: cover; border-radius: 16px; margin-bottom: 16px; }
+.assessment-card { padding: 20px 0; border-bottom: 1px solid #e5e7eb; }
+.audit-json { overflow: auto; max-height: 360px; white-space: pre-wrap; }
+button:disabled { opacity: .55; cursor: not-allowed; }

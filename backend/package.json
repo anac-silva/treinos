@@ -4,6 +4,9 @@
   "private": true,
   "engines": { "node": ">=22.12" },
   "scripts": {
+    "db:start": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/local-db.ps1 start",
+    "db:stop": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/local-db.ps1 stop",
+    "db:status": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/local-db.ps1 status",
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/src/main.js",
     "start:dev": "node --watch -r ts-node/register src/main.ts",

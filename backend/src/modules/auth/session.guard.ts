@@ -19,7 +19,7 @@ export class SessionGuard implements CanActivate {
     const token = cookies?.[this.config.cookieName];
     if (typeof token !== 'string') throw new UnauthorizedException('Autenticação necessária.');
     request.auth = await this.auth.authenticate(token);
-    if (request.auth.user.mustChangePassword && !this.reflector.getAllAndOverride<boolean>(ALLOW_PASSWORD_CHANGE, targets)) {
+    if (request.auth.user.mustChangePassword && !this.config.localAuthBypass && !this.reflector.getAllAndOverride<boolean>(ALLOW_PASSWORD_CHANGE, targets)) {
       throw new ForbiddenException({ code: 'PASSWORD_CHANGE_REQUIRED', message: 'Altere a senha inicial antes de continuar.' });
     }
     if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method)) {

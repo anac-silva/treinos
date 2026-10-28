@@ -10,6 +10,8 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, { bodyParser: false });
   configureApp(app);
   app.enableShutdownHooks();
-  await app.listen(app.get<AppConfig>(APP_CONFIG).port);
+  const config = app.get<AppConfig>(APP_CONFIG);
+  if (config.localAuthBypass) await app.listen(config.port, '127.0.0.1');
+  else await app.listen(config.port);
 }
 bootstrap().catch(() => { new Logger('Bootstrap').error('Falha ao iniciar API. Verifique configuração e disponibilidade do banco.'); process.exitCode = 1; });
