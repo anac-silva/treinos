@@ -253,5 +253,15 @@ describe('clients, assessments, measurements e photos HTTP + PostgreSQL', () => 
     expect(history.total).toBe(1);
     expect(history.items[0].id).toBe(saved.body.id);
   });
+  it('persiste a seleção feminino ou masculino e rejeita valores inválidos', async () => {
+    const client = (await create('/clients', { name: 'Cliente ilustração', sex: 'FEMALE' }).expect(201)).body;
+    expect((await get(`/clients/${client.id}`).expect(200)).body.sex).toBe('FEMALE');
+    await patch(`/clients/${client.id}`, { name: client.name, sex: 'MALE' }).expect(200);
+    expect((await get(`/clients/${client.id}`).expect(200)).body.sex).toBe('MALE');
+    await patch(`/clients/${client.id}`, { name: client.name, sex: 'INVALID' }).expect(400);
+    await patch(`/clients/${client.id}`, { name: client.name, sex: null }).expect(200);
+    expect((await get(`/clients/${client.id}`).expect(200)).body.sex).toBeNull();
+  });
 });
+
 

@@ -1,6 +1,9 @@
-﻿import ClientPanel from '../components/clientPanel';
-import { FiArrowLeft } from 'react-icons/fi';
-import { useState } from 'react';
+﻿import EvolutionChart from '../components/evolutionChart';
+import { evolutionSeries } from '../lib/evolution';
+import ClientPanel from '../components/clientPanel';
+import ClientHeader from '../components/clientHeader';
+import { useEffect, useState } from 'react';
+import { allPages } from '../lib/api';
 import { Link, useParams } from 'react-router-dom';
 import ClientTabs from '../components/clientTabs';
 
@@ -13,18 +16,54 @@ function Corrections({ clientId, assessmentId }) {
 }
 function History({ id }) {
   const [page, setPage] = useState(1);
-  return <section className="settings-section"><h2>Histórico de avaliações</h2><HistoryPage key={page} id={id} page={page} setPage={setPage} /></section>;
+  return <section className="settings-section"><h2>Histórico de avaliações</h2><HistoryPage key={id} id={id} page={page} setPage={setPage} /></section>;
+}
+function AssessmentHistoryItem({ assessments, clientId }) {
+  const assessment = assessments[0];
+  const [open, setOpen] = useState(false);
+  const detailsId = `assessment-details-${assessment.id}`;
+  return <article className="assessment-history-item">
+    <div className="assessment-history-row">
+      <time dateTime={assessment.assessedOn}>{date(assessment.assessedOn)}</time>
+      <button type="button" className="button button-outline" aria-expanded={open} aria-controls={detailsId} onClick={() => setOpen(!open)}>{open ? 'Ocultar detalhes' : 'Ver detalhes'}</button>
+    </div>
+    {open && <div id={detailsId} className="assessment-history-details">
+      {assessments.map((assessment, index) => <div key={assessment.id} className="assessment-day-record">
+      {assessments.length > 1 && <h3>Registro {index + 1}{assessment.createdAt && <> · {new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' }).format(new Date(assessment.createdAt))}</>}</h3>}
+      <dl className="assessment-summary"><div><dt>Peso</dt><dd>{assessment.weightKg} kg</dd></div><div><dt>Próxima avaliação</dt><dd>{date(assessment.nextAssessmentOn)}</dd></div></dl>
+      {assessment.measurements.length > 0 && <dl className="assessment-values">{assessment.measurements.map((measurement) => <div key={measurement.id}><dt>{measurement.typeName}</dt><dd>{measurement.value} {measurement.unit}</dd></div>)}</dl>}
+      {assessment.notes && <div className="assessment-history-notes"><h3>Observações</h3><p>{assessment.notes}</p></div>}
+      <Link to={`/clientes/${clientId}/avaliacoes/${assessment.id}/corrigir`} className="button button-outline">Corrigir avaliação</Link>
+      <details className="assessment-audit"><summary>Histórico de correções · versão {assessment.version}</summary><AuditToggle clientId={clientId} assessmentId={assessment.id} /></details>
+      </div>)}
+    </div>}
+  </article>;
 }
 function HistoryPage({ id, page, setPage }) {
-  const { data, loading, error } = useRemote(`/clients/${id}/assessments?page=${page}&pageSize=10`);
+  const [{ items, loading, error }, setHistory] = useState({ items: [], loading: true, error: '' });
+  useEffect(() => {
+    const controller = new AbortController();
+    allPages(`/clients/${id}/assessments`, controller.signal).then((items) => {
+      if (!controller.signal.aborted) setHistory({ items, loading: false, error: '' });
+    }).catch((error) => {
+      if (!controller.signal.aborted) setHistory({ items: [], loading: false, error: error.message });
+    });
+    return () => controller.abort();
+  }, [id]);
   if (loading) return <p role="status">Carregando avaliações…</p>;
   if (error) return <p role="alert">{error}</p>;
-  return <>{!data.items.length && <p>Nenhuma avaliação registrada.</p>}{data.items.map((assessment) => <article key={assessment.id} className="assessment-card"><div className="section-heading"><h3>{date(assessment.assessedOn)} · {assessment.weightKg} kg</h3><Link to={`/clientes/${id}/avaliacoes/${assessment.id}/corrigir`} className="button button-outline">Corrigir</Link></div>
-    <p>Altura: {assessment.heightCm ?? '—'} cm · Gordura: {assessment.bodyFatPercent ?? '—'}% · Próxima avaliação: {date(assessment.nextAssessmentOn)}</p>
-    {assessment.notes && <p>{assessment.notes}</p>}
-    <ul>{assessment.measurements.map((m) => <li key={m.id}>{m.typeName}: {m.value} {m.unit}</li>)}</ul>
-    <details><summary>Correções e auditoria · versão {assessment.version}</summary><AuditToggle clientId={id} assessmentId={assessment.id} /></details>
-  </article>)}<div className="pagination"><button disabled={page === 1} onClick={() => setPage(page - 1)}>Anterior</button><span>Página {page}</span><button disabled={page * data.pageSize >= data.total} onClick={() => setPage(page + 1)}>Próxima</button></div></>;
+  const groups = Object.entries(items.reduce((days, assessment) => {
+    const day = assessment.assessedOn.slice(0, 10);
+    (days[day] ||= []).push(assessment);
+    return days;
+  }, {})).sort(([first], [second]) => second.localeCompare(first));
+  const totalPages = Math.max(1, Math.ceil(groups.length / 10));
+  const visibleDays = groups.slice((page - 1) * 10, page * 10);
+  return <>
+    {!items.length && <p className="catalog-empty">Nenhuma avaliação registrada.</p>}
+    <div className="assessment-history-list">{visibleDays.map(([day, assessments]) => <AssessmentHistoryItem key={day} assessments={assessments} clientId={id} />)}</div>
+    <footer className="table-footer assessment-history-footer"><span>{groups.length} {groups.length === 1 ? 'dia com avaliações' : 'dias com avaliações'} · Página {page} de {totalPages}</span><nav className="pagination" aria-label="Paginação das avaliações"><button type="button" className="button button-outline" disabled={page === 1} onClick={() => setPage(page - 1)}>Anterior</button><button type="button" className="button button-outline" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>Próxima</button></nav></footer>
+  </>;
 }
 function AuditToggle(props) {
   const [open, setOpen] = useState(false);
@@ -41,9 +80,15 @@ function Evolution({ id }) {
 function EvolutionData({ id, range }) {
   const weight = useRemote(`/clients/${id}/assessments/weight-evolution?${range}`);
   const measures = useRemote(`/clients/${id}/measurements?${range}`);
-  return <>{(weight.loading || measures.loading) && <p role="status">Carregando evolução…</p>}{(weight.error || measures.error) && <p role="alert">{weight.error || measures.error}</p>}
-    {weight.data && <><h3>Peso</h3><div className="table-wrap"><table className="data-table"><thead><tr><th>Data</th><th>Peso (kg)</th></tr></thead><tbody>{weight.data.items.map((m) => <tr key={m.assessmentId}><td>{date(m.assessedOn)}</td><td>{m.value}</td></tr>)}</tbody></table></div>{!weight.data.items.length && <p>Sem registros de peso.</p>}</>}
-    {measures.data && <><h3>Medidas corporais</h3><div className="table-wrap"><table className="data-table"><thead><tr><th>Data</th><th>Medição</th><th>Valor</th></tr></thead><tbody>{measures.data.items.map((m) => <tr key={`${m.assessmentId}-${m.typeId}`}><td>{date(m.assessedOn)}</td><td>{m.name}</td><td>{m.value} {m.unit}</td></tr>)}</tbody></table></div>{!measures.data.items.length && <p>Sem medidas registradas.</p>}</>}
+  const measurementSeries = evolutionSeries(measures.data?.items || []);
+  const units = [...new Set(measurementSeries.map((line) => line.unit))];
+  return <>
+    {(weight.loading || measures.loading) && <p role="status">Carregando evolução…</p>}
+    {(weight.error || measures.error) && <p role="alert">{weight.error || measures.error}</p>}
+    <div className="evolution-charts">
+      {weight.data && <EvolutionChart title="Evolução do peso" unit="kg" series={evolutionSeries(weight.data.items)} />}
+      {measures.data && (units.length ? units.map((unit) => <EvolutionChart key={unit} title={units.length > 1 ? `Medidas corporais (${unit})` : 'Medidas corporais'} unit={unit} series={measurementSeries.filter((line) => line.unit === unit)} />) : <EvolutionChart title="Medidas corporais" unit="cm" series={[]} />)}
+    </div>
   </>;
 }
 export default function ClientDetail({ mode }) {
@@ -51,12 +96,17 @@ export default function ClientDetail({ mode }) {
   const { data: client, loading, error } = useRemote(`/clients/${clientId}`);
   if (loading) return <main className="workspace" role="status">Carregando cliente…</main>;
   if (error) return <main className="workspace"><p role="alert">{error}</p><Link to="/clientes">Voltar para clientes</Link></main>;
-  return <ClientPanel><Link to="/clientes" className="back-link"><FiArrowLeft aria-hidden="true" />Voltar para Clientes</Link><header className="page-heading new-client-heading"><div><h1>{client.name}</h1><p>{client.age != null ? `${client.age} anos · ` : ''}{client.goal || 'Objetivo não informado'} · {client.status === 'ACTIVE' ? 'Ativo' : 'Inativo'}</p></div><Link to={`/clientes/${clientId}/editar`} className="button button-outline">Editar cliente</Link></header><ClientTabs />
+  return <ClientPanel><ClientHeader client={client} /><ClientTabs />
     {mode === 'history' && <History id={clientId} />}
-    {mode === 'measurements' && <div className="section-heading"><h2>Medidas e evolução</h2><Link className="button button-primary" to={`/clientes/${clientId}/novaavaliacao`}>Nova avaliação de medidas</Link></div>}
-    {mode !== 'history' && <Evolution id={clientId} />}
+    {mode === 'overview' && <div className="section-heading"><h2>Evolução do aluno</h2><Link className="button button-primary" to={`/clientes/${clientId}/medidas`}>Nova medição</Link></div>}
+    {mode === 'overview' && <Evolution id={clientId} />}
   </ClientPanel>;
 }
+
+
+
+
+
 
 
 

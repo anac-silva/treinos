@@ -1,0 +1,18 @@
+﻿.evolution-charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.evolution-chart { min-width: 0; padding: 18px 14px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+.evolution-chart header { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px; }
+.client-profile-panel .evolution-chart header h3 { margin: 0; color: var(--wine); font-size: 16px; }
+.evolution-chart header > span { color: var(--muted); font-size: 12px; }
+.evolution-chart svg { display: block; width: 100%; height: auto; }
+.evolution-grid { stroke: #eee8ea; stroke-dasharray: 4 4; }
+.evolution-axis { fill: #81767c; font-size: 12px; font-family: inherit; }
+.evolution-chart circle[role="button"] { cursor: pointer; }
+.evolution-chart circle[role="button"]:focus { outline: none; stroke: var(--wine); stroke-width: 2px; }
+.client-profile-panel .evolution-point-info { min-height: 20px; margin: 4px 0 12px; text-align: center; font-size: 12px; color: var(--muted); }
+.evolution-legend { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; }
+.evolution-legend button { display: inline-flex; align-items: center; gap: 6px; padding: 6px 9px; border: 1px solid var(--line); border-radius: 20px; background: white; color: #55424b; font-size: 12px; cursor: pointer; }
+.evolution-legend button[aria-pressed="false"] { opacity: .45; text-decoration: line-through; }
+.evolution-legend i { width: 8px; height: 8px; border-radius: 50%; }
+@container client-editor (max-width: 800px) {
+  .evolution-charts { grid-template-columns: minmax(0, 1fr); }
+}

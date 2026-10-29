@@ -21,7 +21,8 @@ function Protected() {
 }
 function ClientRoute({ mode }) {
   const { clientId, assessmentId } = useParams();
-  if (mode === 'edit' || mode === 'overview') return <ClientForm key={clientId} />;
+  if (mode === 'edit') return <ClientForm key={clientId} />;
+  if (mode === 'new-assessment') return <Navigate to={'/clientes/' + clientId + '/medidas'} replace />;
   if (mode === 'assessment') return <AssessmentForm key={clientId + (assessmentId || 'new')} />;
   return <ClientDetail key={clientId + mode} mode={mode} />;
 }
@@ -36,8 +37,8 @@ export default function Body() {
       <Route path="/clientes/:clientId/editar" element={<ClientRoute mode="edit" />} />
       <Route path="/clientes/:clientId/visaogeral" element={<ClientRoute mode="overview" />} />
       <Route path="/clientes/:clientId/historico" element={<ClientRoute mode="history" />} />
-      <Route path="/clientes/:clientId/medidas" element={<ClientRoute mode="measurements" />} />
-      <Route path="/clientes/:clientId/novaavaliacao" element={<ClientRoute mode="assessment" />} />
+      <Route path="/clientes/:clientId/medidas" element={<ClientRoute mode="assessment" />} />
+      <Route path="/clientes/:clientId/novaavaliacao" element={<ClientRoute mode="new-assessment" />} />
       <Route path="/clientes/:clientId/avaliacoes/:assessmentId/corrigir" element={<ClientRoute mode="assessment" />} />
       <Route path="/clientes/:clientId/treinos" element={<Unsupported kind="treinos" />} />
       <Route path="/configuracoes" element={<Configuracoes />} />
@@ -48,5 +49,7 @@ export default function Body() {
     </Route>
   </Routes></AuthProvider>;
 }
+
+
 
 

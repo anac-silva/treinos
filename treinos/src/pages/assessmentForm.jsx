@@ -1,6 +1,6 @@
 ﻿import BodyMeasurementGuide from '../components/bodyMeasurementGuide';
 import ClientPanel from '../components/clientPanel';
-import { FiArrowLeft } from 'react-icons/fi';
+import ClientHeader from '../components/clientHeader';
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import ClientTabs from '../components/clientTabs';
@@ -26,10 +26,10 @@ function AssessmentEditor({ client, assessment }) {
     if (assessment) { body.reason = values.reason; body.expectedVersion = assessment.version; }
     try {
       await api(`/clients/${client.id}/assessments${assessment ? `/${assessment.id}/corrections` : ''}`, { method: 'POST', body });
-      navigate(`/clientes/${client.id}/historico`);
+      navigate(`/clientes/${client.id}/visaogeral`);
     } catch (error) { setError(error.message); } finally { setBusy(false); }
   }
-  return <ClientPanel><Link className="back-link" to={`/clientes/${client.id}/visaogeral`}><FiArrowLeft aria-hidden="true" />Voltar para o perfil</Link><header className="new-client-heading"><div><h1>{client.name}</h1><p>Registre e acompanhe as medidas do aluno.</p></div></header><ClientTabs /><h2>{assessment ? 'Corrigir avaliação' : 'Nova avaliação'}</h2>
+  return <ClientPanel><ClientHeader client={client} /><ClientTabs /><h2>{assessment ? 'Corrigir avaliação' : 'Nova medição'}</h2>
     {assessment && <p>Versão {assessment.version}. A correção será registrada no histórico de auditoria.</p>}
     {(error || catalogError) && <p role="alert" className="catalog-error">{error || catalogError}</p>}
     {loading ? <p role="status">Carregando catálogo…</p> : <form className="form-layout client-form-layout" onSubmit={submit} onInvalid={(event) => setError(event.target.name === 'weightKg' ? 'Informe um peso válido para salvar a avaliação.' : 'Confira os campos obrigatórios e os valores informados.')}>
@@ -46,7 +46,7 @@ function AssessmentEditor({ client, assessment }) {
       </section>
       <label className="field full-field">Observações<textarea name="notes" maxLength={5000} defaultValue={assessment?.notes || ''} /></label>
       {assessment && <label className="field full-field">Motivo da correção<textarea name="reason" required maxLength={500} /></label>}
-      <div className="form-actions full-field"><Link className="button button-outline" to={`/clientes/${client.id}/visaogeral`}>Cancelar</Link><button disabled={busy || Boolean(catalogError)} className="button button-primary">{busy ? 'Salvando…' : assessment ? 'Salvar correção' : 'Salvar avaliação'}</button></div>
+      <div className="form-actions full-field"><Link className="button button-outline" to={`/clientes/${client.id}/visaogeral`}>Cancelar</Link><button disabled={busy || Boolean(catalogError)} className="button button-primary">{busy ? 'Salvando…' : assessment ? 'Salvar correção' : 'Salvar medição'}</button></div>
     </form>}
   </ClientPanel>;
 }
@@ -63,6 +63,8 @@ export default function AssessmentForm() {
   if (error) return <main className="workspace"><p role="alert">{error}</p></main>;
   return assessmentId ? <Correction client={data} id={assessmentId} /> : <AssessmentEditor client={data} />;
 }
+
+
 
 
 
