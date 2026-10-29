@@ -57,3 +57,55 @@
   .client-editor-card textarea { height: 76px; min-height: 76px; }
   .client-editor-card .form-actions { padding-top: 14px; }
 }
+
+
+
+.client-profile-panel > .settings-section { margin-top: 18px; padding: 20px; border-color: #eee6e8; border-radius: 8px; box-shadow: none; }
+.client-profile-panel > h2 { margin: 0 0 20px; color: var(--wine); font-size: 22px; font-weight: 700; }
+.client-profile-panel .section-heading { margin-top: 20px; margin-bottom: 18px; flex-wrap: wrap; }
+.client-profile-panel .section-heading h2 { color: var(--wine); font-size: 21px; }
+.client-profile-panel .settings-section > h2 { margin: 0 0 16px; color: var(--wine); font-size: 20px; font-weight: 600; }
+.client-profile-panel .settings-section h3 { margin: 20px 0 12px; color: #45353b; font-size: 15px; font-weight: 600; }
+.client-profile-panel .catalog-form { gap: 14px; margin-bottom: 24px; }
+.client-profile-panel .catalog-form .field { flex: 1 1 180px; }
+.client-profile-panel .catalog-form .button { flex: 0 0 auto; min-width: 100px; }
+.client-profile-panel .settings-section p { font-size: 13px; line-height: 1.6; color: var(--muted); }
+.client-profile-panel .button-primary { background: var(--wine); }
+.client-profile-panel .data-table th { background: #f5f3f3; }
+.client-profile-panel .data-table td { height: 46px; }
+@container client-editor (max-width: 440px) {
+  .client-profile-panel > .settings-section { padding: 14px; }
+  .client-profile-panel .new-client-heading { flex-wrap: wrap; }
+  .client-profile-panel .section-heading { align-items: stretch; flex-direction: column; }
+  .client-profile-panel .catalog-form { align-items: stretch; }
+  .client-profile-panel .catalog-form .button { width: 100%; }
+}
+
+/* Visão geral e edição usam o mesmo formulário, sem espaços vazios na grade. */
+.client-editor-card .client-edit-fields > .field { grid-column: span 3; }
+.client-editor-card .client-edit-fields > .full-field { grid-column: 1 / -1; }
+@container client-editor (max-width: 680px) {
+  .client-editor-card .client-edit-fields > .field { grid-column: span 1; }
+  .client-editor-card .client-edit-fields > .full-field { grid-column: 1 / -1; }
+}
+
+.assessment-measurements { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; gap: 28px; padding-top: 8px; }
+.assessment-body-guide { display: grid; justify-items: center; margin: 0; padding: 18px; border: 1px solid #eee6e8; border-radius: 10px; background: #faf8f8; }
+.assessment-body-guide svg { display: block; width: 100%; max-width: 360px; height: auto; }
+.assessment-body-guide figcaption { margin-top: 6px; color: var(--muted); text-align: center; font-size: 11px; }
+.assessment-measurement-list { min-width: 0; }
+.assessment-measurement-list h3 { margin: 0 0 16px; color: var(--wine); font-size: 17px; font-weight: 600; }
+.client-editor-card .assessment-measurement-field { display: grid; grid-template-columns: minmax(0, 1fr) minmax(90px, 120px); align-items: center; gap: 12px; margin-bottom: 10px; }
+.assessment-measurement-field span { overflow-wrap: anywhere; }
+.client-editor-card .assessment-measurement-field input { height: 40px; }
+@container client-editor (max-width: 680px) {
+  .assessment-measurements { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .assessment-body-guide svg { max-width: 260px; }
+  .assessment-body-guide { padding: 12px; }
+}
+
+.assessment-body-guide { border: 0; background: #fff; padding: 12px; }
+.assessment-body-image { display: block; width: 100%; max-width: 300px; height: auto; object-fit: contain; }
+@container client-editor (max-width: 680px) {
+  .assessment-body-image { max-width: 220px; }
+}

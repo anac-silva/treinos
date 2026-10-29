@@ -435,3 +435,12 @@ body:has(.app-layout) { height: 100dvh; min-height: 0; overflow: hidden; }
 }
 
 .appointment-confirm-content .appointment-confirm-name { display: block; margin-bottom: 6px; color: var(--wine); font-size: 20px; font-weight: 700; line-height: 1.4; }
+
+.profile-tabs .profile-tab { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.profile-tab svg { width: 17px; height: 17px; flex-shrink: 0; }
+.client-editor-card .profile-tabs { margin-bottom: 22px; }
+@media (max-width: 480px) {
+  .profile-tabs { gap: 0; }
+  .profile-tabs .profile-tab { gap: 4px; padding: 10px 4px; font-size: 11px; }
+  .profile-tab svg { width: 14px; height: 14px; }
+}

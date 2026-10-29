@@ -38,6 +38,8 @@ model Client {
   id              String       @id @default(uuid()) @db.Uuid
   name            String       @db.VarChar(100)
   age             Int?
+  heightCm        Decimal?     @db.Decimal(6, 2)
+  sex             String?      @db.VarChar(10)
   email           String?      @db.VarChar(254)
   phone           String?      @db.VarChar(40)
   goal            String?      @db.VarChar(100)
@@ -157,3 +159,4 @@ model Session {
   @@index([userId, revokedAt])
   @@index([expiresAt])
 }
+

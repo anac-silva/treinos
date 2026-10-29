@@ -1,42 +1,12 @@
+﻿import ClientPanel from '../components/clientPanel';
+import { FiArrowLeft } from 'react-icons/fi';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import ClientTabs from '../components/clientTabs';
-import { api } from '../lib/api';
+
 import { useRemote } from '../lib/useRemote';
 
 const date = (value) => value ? value.slice(0, 10).split('-').reverse().join('/') : '—';
-function Photo({ client }) {
-  const [revision, setRevision] = useState(0);
-  const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState('');
-  const [failed, setFailed] = useState(false);
-  const [hasPhoto, setHasPhoto] = useState(Boolean(client.photos?.length));
-  async function upload(event) {
-    event.preventDefault();
-    const form = event.currentTarget;
-    const body = new FormData(form);
-    const file = body.get('file');
-    if (!file?.size || file.size > 5 * 1024 * 1024) { setMessage('Selecione uma foto de até 5 MB.'); return; }
-    setBusy(true); setMessage(''); setFailed(false);
-    try { await api(`/clients/${client.id}/photo`, { method: 'POST', body }); setHasPhoto(true); setRevision((value) => value + 1); setMessage('Foto enviada.'); form.reset(); }
-    catch (error) {
-      setMessage(error.status === 503
-        ? 'Armazenamento de fotos indisponível. Confirme PHOTO_STORAGE=local e reinicie a API.'
-        : error.message);
-      setFailed(true);
-    } finally { setBusy(false); }
-  }
-  return <section className="settings-section"><h2>Foto do cliente</h2>{hasPhoto && <PhotoImage key={revision} id={client.id} />}
-    <p>As fotos ficam privadas; neste ambiente de desenvolvimento, são salvas neste computador.</p>
-    <form onSubmit={upload} className="catalog-form"><label className="field">Foto JPEG, PNG ou WebP (até 5 MB)<input type="file" name="file" required accept="image/jpeg,image/png,image/webp" /></label><button className="button button-outline" disabled={busy}>{busy ? 'Enviando…' : 'Enviar foto'}</button></form>
-    {message && <p role={failed ? 'alert' : 'status'}>{message}</p>}
-    {hasPhoto && <button className="button button-outline" type="button" onClick={() => setRevision((value) => value + 1)}>Atualizar foto</button>}
-  </section>;
-}
-function PhotoImage({ id }) {
-  const { data, loading, error } = useRemote(`/clients/${id}/photo`);
-  return <>{loading && <p>Carregando foto…</p>}{error && <p role="alert">{error}</p>}{data && <img className="client-photo" src={data.url} alt="Foto do cliente" />}</>;
-}
 function Corrections({ clientId, assessmentId }) {
   const { data, loading, error } = useRemote(`/clients/${clientId}/assessments/${assessmentId}/corrections`);
   return <>{loading && <p>Carregando auditoria…</p>}{error && <p role="alert">{error}</p>}{data && (!data.length ? <p>Sem correções.</p> : data.map((correction) => <div key={correction.id}><p>Versão {correction.version} · {date(correction.createdAt)} · {correction.reason}</p><details><summary>Antes e depois</summary><pre className="audit-json">{JSON.stringify({ antes: correction.before, depois: correction.after }, null, 2)}</pre></details></div>))}</>;
@@ -81,8 +51,13 @@ export default function ClientDetail({ mode }) {
   const { data: client, loading, error } = useRemote(`/clients/${clientId}`);
   if (loading) return <main className="workspace" role="status">Carregando cliente…</main>;
   if (error) return <main className="workspace"><p role="alert">{error}</p><Link to="/clientes">Voltar para clientes</Link></main>;
-  return <main className="workspace"><Link to="/clientes" className="back-link">Voltar para clientes</Link><header className="page-heading"><div><h1>{client.name}</h1><p>{client.age != null ? `${client.age} anos · ` : ''}{client.goal || 'Objetivo não informado'} · {client.status === 'ACTIVE' ? 'Ativo' : 'Inativo'}</p></div><Link to={`/clientes/${clientId}/editar`} className="button button-outline">Editar cliente</Link></header><ClientTabs />
-    {mode === 'overview' && <><section className="settings-section"><h2>Cadastro</h2><p>E-mail: {client.email || '—'} · Telefone: {client.phone || '—'}</p><p>Nível: {client.experienceLevel || '—'}</p><p>{client.notes}</p><Link className="button button-primary" to={`/clientes/${clientId}/novaavaliacao`}>Registrar avaliação</Link></section><Photo client={client} /><History id={clientId} /></>}
-    <Evolution id={clientId} />
-  </main>;
+  return <ClientPanel><Link to="/clientes" className="back-link"><FiArrowLeft aria-hidden="true" />Voltar para Clientes</Link><header className="page-heading new-client-heading"><div><h1>{client.name}</h1><p>{client.age != null ? `${client.age} anos · ` : ''}{client.goal || 'Objetivo não informado'} · {client.status === 'ACTIVE' ? 'Ativo' : 'Inativo'}</p></div><Link to={`/clientes/${clientId}/editar`} className="button button-outline">Editar cliente</Link></header><ClientTabs />
+    {mode === 'history' && <History id={clientId} />}
+    {mode === 'measurements' && <div className="section-heading"><h2>Medidas e evolução</h2><Link className="button button-primary" to={`/clientes/${clientId}/novaavaliacao`}>Nova avaliação de medidas</Link></div>}
+    {mode !== 'history' && <Evolution id={clientId} />}
+  </ClientPanel>;
 }
+
+
+
+

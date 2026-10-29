@@ -1,4 +1,4 @@
-import 'reflect-metadata';
+﻿import 'reflect-metadata';
 import { Test } from '@nestjs/testing';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import request from 'supertest';
@@ -238,4 +238,20 @@ describe('clients, assessments, measurements e photos HTTP + PostgreSQL', () => 
     expect(files.size).toBe(objectCount);
     expect((await get(`/clients/${clientId}/photo`).expect(200)).body.id).toBe(previous);
   });
+  it('salva altura no cadastro e avaliação somente com peso', async () => {
+    const client = (await create('/clients', { name: 'Cliente altura e peso', heightCm: 175 }).expect(201)).body;
+    const saved = await create(`/clients/${client.id}/assessments`, {
+      assessedOn: '2026-10-28', weightKg: 70, nextAssessmentOn: null, notes: null, measurements: [],
+    }).expect(201);
+    expect(saved.body.weightKg).toBe('70');
+    expect(saved.body.measurements).toEqual([]);
+    expect(saved.body.heightCm).toBeNull();
+    expect(saved.body.bodyFatPercent).toBeNull();
+    await patch(`/clients/${client.id}`, { name: client.name, heightCm: 176 }).expect(200);
+    expect((await get(`/clients/${client.id}`).expect(200)).body.heightCm).toBe('176');
+    const history = (await get(`/clients/${client.id}/assessments`).expect(200)).body;
+    expect(history.total).toBe(1);
+    expect(history.items[0].id).toBe(saved.body.id);
+  });
 });
+

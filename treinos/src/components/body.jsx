@@ -21,7 +21,7 @@ function Protected() {
 }
 function ClientRoute({ mode }) {
   const { clientId, assessmentId } = useParams();
-  if (mode === 'edit') return <ClientForm key={clientId} />;
+  if (mode === 'edit' || mode === 'overview') return <ClientForm key={clientId} />;
   if (mode === 'assessment') return <AssessmentForm key={clientId + (assessmentId || 'new')} />;
   return <ClientDetail key={clientId + mode} mode={mode} />;
 }
@@ -35,6 +35,7 @@ export default function Body() {
       <Route path="/clientes/novocliente" element={<ClientForm />} />
       <Route path="/clientes/:clientId/editar" element={<ClientRoute mode="edit" />} />
       <Route path="/clientes/:clientId/visaogeral" element={<ClientRoute mode="overview" />} />
+      <Route path="/clientes/:clientId/historico" element={<ClientRoute mode="history" />} />
       <Route path="/clientes/:clientId/medidas" element={<ClientRoute mode="measurements" />} />
       <Route path="/clientes/:clientId/novaavaliacao" element={<ClientRoute mode="assessment" />} />
       <Route path="/clientes/:clientId/avaliacoes/:assessmentId/corrigir" element={<ClientRoute mode="assessment" />} />
@@ -47,3 +48,5 @@ export default function Body() {
     </Route>
   </Routes></AuthProvider>;
 }
+
+

@@ -1,3 +1,6 @@
+﻿import BodyMeasurementGuide from '../components/bodyMeasurementGuide';
+import ClientPanel from '../components/clientPanel';
+import { FiArrowLeft } from 'react-icons/fi';
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import ClientTabs from '../components/clientTabs';
@@ -18,32 +21,34 @@ function AssessmentEditor({ client, assessment }) {
     event.preventDefault(); setBusy(true); setError('');
     const values = Object.fromEntries(new FormData(event.currentTarget));
     const body = { assessedOn: values.assessedOn, weightKg: Number(values.weightKg),
-      heightCm: values.heightCm ? Number(values.heightCm) : null,
-      bodyFatPercent: values.bodyFatPercent ? Number(values.bodyFatPercent) : null,
       nextAssessmentOn: values.nextAssessmentOn || null, notes: values.notes || null,
       measurements: types.filter((type) => values[`measure-${type.id}`] !== '').map((type) => ({ typeId: type.id, value: Number(values[`measure-${type.id}`]) })) };
     if (assessment) { body.reason = values.reason; body.expectedVersion = assessment.version; }
     try {
       await api(`/clients/${client.id}/assessments${assessment ? `/${assessment.id}/corrections` : ''}`, { method: 'POST', body });
-      navigate(`/clientes/${client.id}/visaogeral`);
+      navigate(`/clientes/${client.id}/historico`);
     } catch (error) { setError(error.message); } finally { setBusy(false); }
   }
-  return <main className="workspace"><h1>{client.name}</h1><ClientTabs /><h2>{assessment ? 'Corrigir avaliação' : 'Nova avaliação'}</h2>
+  return <ClientPanel><Link className="back-link" to={`/clientes/${client.id}/visaogeral`}><FiArrowLeft aria-hidden="true" />Voltar para o perfil</Link><header className="new-client-heading"><div><h1>{client.name}</h1><p>Registre e acompanhe as medidas do aluno.</p></div></header><ClientTabs /><h2>{assessment ? 'Corrigir avaliação' : 'Nova avaliação'}</h2>
     {assessment && <p>Versão {assessment.version}. A correção será registrada no histórico de auditoria.</p>}
     {(error || catalogError) && <p role="alert" className="catalog-error">{error || catalogError}</p>}
-    {loading ? <p role="status">Carregando catálogo…</p> : <form className="form-layout" onSubmit={submit}>
-      <label className="field">Data<input name="assessedOn" type="date" required defaultValue={assessment?.assessedOn || today} /></label>
-      <label className="field">Peso (kg)<input name="weightKg" type="number" min="0.001" max="9999.999" step="0.001" required defaultValue={assessment?.weightKg || ''} /></label>
-      <label className="field">Altura (cm)<input name="heightCm" type="number" min="0.01" max="9999.99" step="0.01" defaultValue={assessment?.heightCm || ''} /></label>
-      <label className="field">Gordura corporal (%)<input name="bodyFatPercent" type="number" min="0" max="100" step="0.01" defaultValue={assessment?.bodyFatPercent ?? ''} /></label>
-      <label className="field">Próxima avaliação<input name="nextAssessmentOn" type="date" defaultValue={assessment?.nextAssessmentOn || ''} /></label>
-      {types.map((type) => <label className="field" key={type.id}>{type.name} ({type.unit})<input name={`measure-${type.id}`} type="number" min="0" max="9999999.999" step="0.001" defaultValue={assessment?.measurements.find((m) => m.typeId === type.id)?.value ?? ''} /></label>)}
-      {!types.length && <p>Sem tipos de medição cadastrados. Você pode registrar somente o peso ou cadastrar tipos em Configurações.</p>}
+    {loading ? <p role="status">Carregando catálogo…</p> : <form className="form-layout client-form-layout" onSubmit={submit} onInvalid={(event) => setError(event.target.name === 'weightKg' ? 'Informe um peso válido para salvar a avaliação.' : 'Confira os campos obrigatórios e os valores informados.')}>
+      <label className="field">Data<input name="assessedOn" type="date" required defaultValue={assessment?.assessedOn?.slice(0, 10) || today} /></label>
+      <label className="field">Peso (kg) *<input name="weightKg" type="number" min="0.001" max="9999.999" step="0.001" required defaultValue={assessment?.weightKg || ''} /></label>
+      <label className="field">Próxima avaliação<input name="nextAssessmentOn" type="date" defaultValue={assessment?.nextAssessmentOn?.slice(0, 10) || ''} /></label>
+      <section className="full-field assessment-measurements" aria-labelledby="assessment-measurements-title">
+        <BodyMeasurementGuide sex={client.sex} />
+        <div className="assessment-measurement-list">
+          <h3 id="assessment-measurements-title">Medidas corporais</h3>
+          {types.map((type) => <label className="field assessment-measurement-field" key={type.id}><span>{type.name} ({type.unit})</span><input name={`measure-${type.id}`} type="number" min="0" max="9999999.999" step="0.001" placeholder="—" defaultValue={assessment?.measurements.find((m) => m.typeId === type.id)?.value ?? ''} /></label>)}
+          {!types.length && <p className="catalog-empty">Sem tipos de medição cadastrados. Você pode registrar somente o peso ou cadastrar tipos em Configurações.</p>}
+        </div>
+      </section>
       <label className="field full-field">Observações<textarea name="notes" maxLength={5000} defaultValue={assessment?.notes || ''} /></label>
       {assessment && <label className="field full-field">Motivo da correção<textarea name="reason" required maxLength={500} /></label>}
       <div className="form-actions full-field"><Link className="button button-outline" to={`/clientes/${client.id}/visaogeral`}>Cancelar</Link><button disabled={busy || Boolean(catalogError)} className="button button-primary">{busy ? 'Salvando…' : assessment ? 'Salvar correção' : 'Salvar avaliação'}</button></div>
     </form>}
-  </main>;
+  </ClientPanel>;
 }
 function Correction({ client, id }) {
   const { data, loading, error } = useRemote(`/clients/${client.id}/assessments/${id}`);
@@ -58,3 +63,8 @@ export default function AssessmentForm() {
   if (error) return <main className="workspace"><p role="alert">{error}</p></main>;
   return assessmentId ? <Correction client={data} id={assessmentId} /> : <AssessmentEditor client={data} />;
 }
+
+
+
+
+

@@ -1,4 +1,4 @@
-import { IsEmail, IsEnum, IsInt, IsOptional, IsString, Length, Max, MaxLength, Min, ValidateIf } from 'class-validator';
+﻿import { IsEmail, IsEnum, IsIn, IsInt, IsNumber, IsOptional, IsString, Length, Max, MaxLength, Min, ValidateIf } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { ClientStatus } from '../../generated/prisma/client';
 import { SearchDto, Trim } from '../../shared/dto';
@@ -8,6 +8,10 @@ export class CreateClientDto {
   name!: string;
   @IsOptional() @IsInt() @Min(0) @Max(150)
   age?: number | null;
+  @IsOptional() @IsIn(['FEMALE', 'MALE'])
+  sex?: 'FEMALE' | 'MALE' | null;
+  @IsOptional() @IsNumber({ maxDecimalPlaces: 2 }) @Min(1) @Max(300)
+  heightCm?: number | null;
   @IsOptional() @Transform(({ value }: { value: unknown }) => typeof value === 'string' ? value.trim().toLowerCase() : value) @IsEmail() @MaxLength(254)
   email?: string | null;
   @IsOptional() @Trim() @IsString() @MaxLength(40)
@@ -33,3 +37,5 @@ export class ListClientsDto extends SearchDto {
   @IsOptional() @Trim() @IsString() @MaxLength(100)
   goal?: string;
 }
+
+
