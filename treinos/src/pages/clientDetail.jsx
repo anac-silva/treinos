@@ -19,9 +19,15 @@ function Photo({ client }) {
     if (!file?.size || file.size > 5 * 1024 * 1024) { setMessage('Selecione uma foto de até 5 MB.'); return; }
     setBusy(true); setMessage(''); setFailed(false);
     try { await api(`/clients/${client.id}/photo`, { method: 'POST', body }); setHasPhoto(true); setRevision((value) => value + 1); setMessage('Foto enviada.'); form.reset(); }
-    catch (error) { setMessage(error.message); setFailed(true); } finally { setBusy(false); }
+    catch (error) {
+      setMessage(error.status === 503
+        ? 'Armazenamento de fotos indisponível. Confirme PHOTO_STORAGE=local e reinicie a API.'
+        : error.message);
+      setFailed(true);
+    } finally { setBusy(false); }
   }
   return <section className="settings-section"><h2>Foto do cliente</h2>{hasPhoto && <PhotoImage key={revision} id={client.id} />}
+    <p>As fotos ficam privadas; neste ambiente de desenvolvimento, são salvas neste computador.</p>
     <form onSubmit={upload} className="catalog-form"><label className="field">Foto JPEG, PNG ou WebP (até 5 MB)<input type="file" name="file" required accept="image/jpeg,image/png,image/webp" /></label><button className="button button-outline" disabled={busy}>{busy ? 'Enviando…' : 'Enviar foto'}</button></form>
     {message && <p role={failed ? 'alert' : 'status'}>{message}</p>}
     {hasPhoto && <button className="button button-outline" type="button" onClick={() => setRevision((value) => value + 1)}>Atualizar foto</button>}

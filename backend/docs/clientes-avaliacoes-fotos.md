@@ -161,7 +161,10 @@ base64 ou URL arbitrária recebida do usuário no banco. URLs assinadas são
 produzidas pelo adaptador ao consultar, não persistidas. O retorno público
 não expõe storageKey. Cliente sem foto retorna 404.
 
-Configure as variáveis de `.env.example`:
+Para desenvolvimento neste computador, configure `PHOTO_STORAGE=local`. As
+imagens ficam em `backend/.local-photos/`, fora da pasta pública, e são servidas
+somente pela API autenticada. Esse modo só inicia com `NODE_ENV=development`;
+não use armazenamento local em produção. Para produção, configure S3:
 
 ```dotenv
 PHOTO_STORAGE=s3
@@ -177,7 +180,7 @@ produção e PATH_STYLE conforme o provedor. O adaptador não cria buckets ou
 altera policies. Requer PutObject/GetObject/DeleteObject no prefixo usado.
 
 Com PHOTO_STORAGE=disabled, upload retorna 503, mantendo os demais módulos
-operacionais. Não há fallback para disco local ou URL pública.
+operacionais. Não há fallback automático entre S3 e disco local.
 
 Novo upload só passa a principal após sucesso no storage e banco. Os uploads
 do mesmo cliente são serializados por lock do registro Client e protegidos

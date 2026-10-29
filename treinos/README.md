@@ -38,9 +38,11 @@ Use front e API no mesmo site para o cookie SameSite=Lax funcionar.
 - Dashboard com nome do personal e total real de clientes ativos.
 - Clientes: listagem paginada, busca por nome/e-mail/telefone, filtros de
   objetivo/status, cadastro, edição, inativação e reativação.
+- Agendamentos: cadastro por cliente/data/horário/duração/tipo, consulta por
+  período, edição, conclusão e cancelamento; os registros são persistidos no PostgreSQL.
 - Perfil selecionado por ID, sem cliente fixo.
-- Foto principal: envio multipart e consulta da URL temporária. Exige S3
-  configurado no backend; falhas de storage são exibidas.
+- Foto principal: envio multipart e consulta autenticada. Em desenvolvimento,
+  as imagens ficam privadas no computador local; produção exige S3 configurado.
 - Avaliações: data, peso, altura em centímetros, gordura, próxima avaliação,
   observações e medidas opcionais. Após o cadastro do cliente, registre a
   avaliação inicial no perfil (requisições independentes).
@@ -52,9 +54,9 @@ Use front e API no mesmo site para o cookie SameSite=Lax funcionar.
 Rotas de perfil usam `/clientes/:clientId/...`. Os caminhos antigos sem ID
 encaminham à lista para que o usuário selecione um cliente.
 
-A API ainda não tem módulos de agenda, exercícios ou prescrição de treinos.
-Agenda/treinos mostram o estado de indisponibilidade. O cadastro de exercícios
-em Configurações continua local, com essa limitação informada na tela.
+O backend ainda não tem módulos de exercícios ou prescrição de treinos; essa
+aba informa a indisponibilidade. O cadastro de exercícios em Configurações
+continua local, com essa limitação informada na tela.
 Tipos de medição antigos no localStorage não são enviados automaticamente
 ao banco: os novos registros usam exclusivamente os IDs reais da API.
 

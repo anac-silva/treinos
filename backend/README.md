@@ -2,18 +2,19 @@
 
 > Banco local configurado: instância exclusiva em localhost:5433, banco
 > `treinos` e banco de testes `treinos_test`. Migrations e seed aplicados;
-> 17 testes HTTP com PostgreSQL real passaram. Consulte
+> testes HTTP com PostgreSQL real passaram. Consulte
 > [banco local](../docs/banco-local.md) para iniciar e acessar o sistema.
 
 > Atualização de integração: o front agora usa esta API para sessão,
-> clientes, catálogo de medições, avaliações, correções, evolução e fotos.
+> clientes, agendamentos, catálogo de medições, avaliações, correções,
+> evolução e fotos.
 > A configuração local está descrita no guia de banco acima.
 > Veja [o README do front](../treinos/README.md) para executar e testar as telas.
 > As observações antigas abaixo sobre ausência de integração descrevem a fase
 > anterior. Os contratos HTTP continuam sem prefixo `/api`; o Vite faz o proxy.
 
 Monólito modular em NestJS 11, TypeScript e Prisma 7 com PostgreSQL. Implementa
-autenticação, clientes, avaliações, medições e fotos; não modifica o front.
+autenticação, clientes, agendamentos, avaliações, medições e fotos.
 Não há cadastro público, contas de clientes ou endpoint de criação de usuários.
 
 ## Estrutura
@@ -24,6 +25,7 @@ src/modules/users/       Consulta do personal e projeção pública
 src/modules/clients/     Cadastro, edição, busca e status dos clientes
 src/modules/assessments/ Avaliações, correções auditadas e evolução de peso
 src/modules/measurements/ Catálogo de tipos/unidades e evolução corporal
+src/modules/appointments/ Cadastro, consulta, atualização e cancelamento de sessões
 src/modules/photos/      Validação de imagens e adaptador de object storage
 src/shared/database/    PrismaService e ciclo de conexão
 src/shared/             Configuração, logs HTTP e tratamento de erros
@@ -34,6 +36,8 @@ test/                   Testes HTTP contra PostgreSQL real
 Controllers cuidam de HTTP; AuthService concentra os casos de uso de sessão.
 UsersService e PrismaService isolam o acesso ao banco. Novos domínios podem
 introduzir repositórios conforme necessário, sem criar microserviços.
+
+Os contratos de agenda estão em [agendamentos](docs/agendamentos.md).
 
 ## Instalação e banco
 

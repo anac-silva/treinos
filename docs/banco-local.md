@@ -7,6 +7,7 @@ preservada. O Treinos usa uma instância própria, somente em localhost:5433.
 | Item | Configuração |
 | --- | --- |
 | Dados persistentes | `backend/.local-postgres/` |
+| Fotos locais de desenvolvimento | `backend/.local-photos/` |
 | Banco da aplicação | `treinos` |
 | Banco separado de testes | `treinos_test` |
 | Usuário da aplicação | `personal`, sem privilégios de superusuário |
@@ -16,6 +17,9 @@ preservada. O Treinos usa uma instância própria, somente em localhost:5433.
 
 As senhas foram geradas aleatoriamente. Esses arquivos e os dados do banco
 estão ignorados pelo Git. Não compartilhe os arquivos de credenciais.
+Fotos enviadas no desenvolvimento ficam em `backend/.local-photos/`, fora da
+pasta pública e servidas pela API autenticada. Essa pasta é ignorada pelo Git;
+faça backup dela se quiser preservar as imagens.
 A senha inicial foi removida do `.env` da API após o seed; o arquivo de acesso
 inicial fica disponível para o primeiro login. O nome inicial é Personal e
 o e-mail é `personal@treinos.local`.
@@ -65,15 +69,17 @@ npm run db:stop
 ```
 
 Não remova `.local-postgres`: essa pasta contém os cadastros persistidos.
+As fotos de desenvolvimento ficam em `.local-photos`, privadas e fora da pasta
+pública; faça backup se quiser preservá-las.
 Os logs da instância ficam em `.local-postgres/server.log`.
 
 ## Verificação realizada
 
 - Cliente Prisma gerado e schema validado.
-- As duas migrations versionadas aplicadas ao banco `treinos`.
+- As migrations versionadas aplicadas ao banco `treinos`.
 - Personal inicial criado com senha hash e troca obrigatória.
 - Backend compilado.
-- Duas suítes HTTP, 17 testes, passaram em PostgreSQL real no banco separado.
+- Duas suítes HTTP passaram em PostgreSQL real no banco separado.
 - Login/sessão/logout verificados na API iniciada na porta 3000.
 - Proxy do Vite verificado: `/api/auth/me` chega à API e retorna 401 sem sessão.
 
@@ -84,6 +90,5 @@ npm run test:e2e
 ```
 
 TEST_DATABASE_URL já está configurada em `.env`. A suíte utiliza schemas
-aleatórios em `treinos_test`, sem apagar o banco da aplicação. Fotos usam
-storage simulado nos testes: upload real ainda exige configurar S3. Em uso
-normal PHOTO_STORAGE permanece disabled.
+aleatórios em `treinos_test`, sem apagar o banco da aplicação. O modo local
+permite testar upload de fotos sem S3; em produção configure um bucket privado.

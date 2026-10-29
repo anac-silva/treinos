@@ -41,6 +41,8 @@ describe('auth HTTP + PostgreSQL real', () => {
     url.searchParams.set('schema', schema);
     process.env.DATABASE_URL = url.toString();
     process.env.NODE_ENV = 'test';
+    process.env.LOCAL_AUTH_BYPASS = 'false';
+    process.env.PHOTO_STORAGE = 'disabled';
     process.env.CORS_ORIGINS = 'http://localhost:5173';
     process.env.TRUST_PROXY = 'loopback';
     // Migrations em schema novo isolado; não apaga nem redefine banco existente.

@@ -11,6 +11,7 @@ import AssessmentForm from '../pages/assessmentForm';
 import Configuracoes from '../pages/configuracoes/configuracoes';
 import Dashboard from '../pages/dashboard';
 import Unsupported from '../pages/unsupported';
+import Agendamentos from '../pages/agendamentos/agendamentos';
 function Protected() {
   const { user, loading } = useAuth();
   if (loading) return <main className="workspace" role="status">Verificando sessão…</main>;
@@ -39,7 +40,7 @@ export default function Body() {
       <Route path="/clientes/:clientId/avaliacoes/:assessmentId/corrigir" element={<ClientRoute mode="assessment" />} />
       <Route path="/clientes/:clientId/treinos" element={<Unsupported kind="treinos" />} />
       <Route path="/configuracoes" element={<Configuracoes />} />
-      <Route path="/agendamentos" element={<Unsupported kind="agenda" />} />
+      <Route path="/agendamentos" element={<Agendamentos />} />
       <Route path="/agendamentos/novoagendamento" element={<Navigate to="/agendamentos" replace />} />
       {['visaogeral', 'medidas', 'novaavaliacao', 'treinos'].map((path) => <Route key={path} path={'/clientes/' + path} element={<Navigate to="/clientes" replace />} />)}
       <Route path="*" element={<main className="workspace"><h1>Página não encontrada</h1></main>} />

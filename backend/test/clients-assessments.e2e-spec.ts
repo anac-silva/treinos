@@ -19,6 +19,7 @@ describe('clients, assessments, measurements e photos HTTP + PostgreSQL', () => 
   let actorId: string;
   let clientId: string;
   let otherId: string;
+  let appointmentId: string;
   let typeId: string;
   let assessmentId: string;
   const schema = `domains_test_${randomUUID().replaceAll('-', '')}`;
@@ -28,6 +29,11 @@ describe('clients, assessments, measurements e photos HTTP + PostgreSQL', () => 
   const storage = {
     put: jest.fn(async (key: string, body: Buffer) => { files.set(key, body); }),
     remove: jest.fn(async (key: string) => { files.delete(key); }),
+    read: jest.fn(async (key: string) => {
+      const body = files.get(key);
+      if (!body) throw new Error('Missing photo');
+      return body;
+    }),
     readUrl: jest.fn(async (key: string) => `https://storage.example/${key}?temporary=test`),
   };
   const http = () => request(app.getHttpServer());
@@ -42,6 +48,8 @@ describe('clients, assessments, measurements e photos HTTP + PostgreSQL', () => 
     url.searchParams.set('schema', schema);
     process.env.DATABASE_URL = url.toString();
     process.env.NODE_ENV = 'test';
+    process.env.LOCAL_AUTH_BYPASS = 'false';
+    process.env.PHOTO_STORAGE = 'disabled';
     process.env.CORS_ORIGINS = 'http://localhost:5173';
     process.env.TRUST_PROXY = 'false';
     execFileSync(process.execPath, ['node_modules/prisma/build/index.js', 'migrate', 'deploy'], { env: process.env, stdio: 'pipe', timeout: 60_000 });
@@ -81,6 +89,51 @@ describe('clients, assessments, measurements e photos HTTP + PostgreSQL', () => 
     await create('/clients', { name: 'Teste', password: 'extra' }).expect(400);
     await get('/clients?page=0').expect(400);
     await get(`/clients/${randomUUID()}`).expect(404);
+  });
+  it('cria, filtra, edita e cancela agendamentos', async () => {
+    const appointment = await create('/appointments', {
+      clientId, startsAt: '2026-12-01T14:30:00.000Z', durationMinutes: 60,
+      type: 'Treino', notes: 'Levar avaliação anterior',
+    }).expect(201);
+    appointmentId = appointment.body.id as string;
+    expect(appointment.body.client.name).toBe('Marina Silva');
+    expect(appointment.body.status).toBe('SCHEDULED');
+
+    const filtered = await get(`/appointments?clientId=${clientId}&from=2026-12-01T00:00:00.000Z&to=2026-12-01T23:59:59.999Z`).expect(200);
+    expect(filtered.body.total).toBe(1);
+    expect(filtered.body.items[0].id).toBe(appointmentId);
+    expect((await get('/appointments?status=CANCELLED').expect(200)).body.total).toBe(0);
+
+    const updated = await patch(`/appointments/${appointmentId}`, {
+      startsAt: '2026-12-02T15:00:00.000Z', durationMinutes: 90, notes: null,
+    }).expect(200);
+    expect(updated.body.startsAt).toBe('2026-12-02T15:00:00.000Z');
+    expect(updated.body.durationMinutes).toBe(90);
+    expect(updated.body.notes).toBeNull();
+
+    const cancelled = await patch(`/appointments/${appointmentId}`, { status: 'CANCELLED' }).expect(200);
+    expect(cancelled.body.status).toBe('CANCELLED');
+    await patch(`/appointments/${randomUUID()}`, { status: 'CANCELLED' }).expect(404);
+    await create('/appointments', { clientId, startsAt: 'invalid', type: 'Treino' }).expect(400);
+    await create('/appointments', { clientId, startsAt: '2026-12-01', type: 'Treino' }).expect(400);
+    await create('/appointments', { clientId, startsAt: '2026-12-01T14:30:00.000Z', durationMinutes: 999, type: 'Treino' }).expect(400);
+    await create('/appointments', { clientId: randomUUID(), startsAt: '2026-12-01T14:30:00.000Z', type: 'Treino' }).expect(404);
+    const preRegistration = await create('/appointments', {
+      guestName: 'Novo contato', guestPhone: '11988887777',
+      startsAt: '2026-12-03T14:30:00.000Z', type: 'Aula experimental',
+    }).expect(201);
+    expect(preRegistration.body.clientId).toBeNull();
+    expect(preRegistration.body.client).toBeNull();
+    expect(preRegistration.body.guestName).toBe('Novo contato');
+    expect(preRegistration.body.guestPhone).toBe('11988887777');
+    expect((await get('/clients?q=Novo%20contato').expect(200)).body.total).toBe(0);
+    await create('/appointments', { guestName: 'Sem telefone', startsAt: '2026-12-03T14:30:00.000Z', type: 'Aula' }).expect(400);
+    const converted = await patch(`/appointments/${preRegistration.body.id}`, {
+      clientId, guestName: null, guestPhone: null,
+    }).expect(200);
+    expect(converted.body.client.name).toBe('Marina Silva');
+    expect(converted.body.guestName).toBeNull();
+    expect(converted.body.guestPhone).toBeNull();
   });
   it('cadastra tipos com nome/unidade e rejeita duplicação', async () => {
     typeId = (await create('/measurement-types', { name: 'Cintura', unit: 'cm' }).expect(201)).body.id as string;
@@ -148,6 +201,19 @@ describe('clients, assessments, measurements e photos HTTP + PostgreSQL', () => 
     const result = await get(`/clients/${clientId}/photo`).expect(200);
     expect(result.body.url).toContain('https://storage.example/'); expect(result.body.expiresIn).toBe(300);
     expect(result.body.storageKey).toBeUndefined();
+    const principal = await database.clientPhoto.findFirstOrThrow({ where: { clientId, principal: true } });
+    const content = await get(`/clients/${clientId}/photo/content?key=${encodeURIComponent(principal.storageKey)}`)
+      .buffer(true)
+      .parse((response, callback) => {
+        const chunks: Buffer[] = [];
+        response.on('data', (chunk: Buffer) => chunks.push(chunk));
+        response.on('end', () => callback(null, Buffer.concat(chunks)));
+      })
+      .expect(200);
+    expect(content.headers['content-type']).toContain('image/png');
+    expect(content.headers['cache-control']).toBe('private, no-store');
+    expect(content.body).toEqual(files.get(principal.storageKey));
+    await get(`/clients/${otherId}/photo/content?key=${encodeURIComponent(principal.storageKey)}`).expect(404);
     storage.put.mockRejectedValueOnce(new Error('Unavailable'));
     await upload(png).expect(503);
     expect(await database.clientPhoto.count({ where: { clientId, principal: true } })).toBe(1);

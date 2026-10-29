@@ -38,6 +38,12 @@ export class S3Storage implements ObjectStorage, OnModuleDestroy {
     const { client, bucket } = this.configured();
     await client.send(new DeleteObjectCommand({ Bucket: bucket, Key: key }));
   }
+  async read(key: string) {
+    const { client, bucket } = this.configured();
+    const result = await client.send(new GetObjectCommand({ Bucket: bucket, Key: key }));
+    if (!result.Body) throw new ServiceUnavailableException('A foto não está disponível no object storage.');
+    return Buffer.from(await result.Body.transformToByteArray());
+  }
   async readUrl(key: string) {
     const { client, bucket } = this.configured();
     return getSignedUrl(client, new GetObjectCommand({ Bucket: bucket, Key: key, ResponseCacheControl: 'private, no-store' }), { expiresIn: 300 });

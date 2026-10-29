@@ -5,7 +5,8 @@
 > O diagnóstico e a tabela abaixo registram o estado anterior à integração.
 > Para execução e teste do estado atual, use o [README do front](../treinos/README.md).
 > O banco local agora está configurado; consulte [o guia](banco-local.md).
-> Agenda e treinos ainda não têm API.
+> Agendamentos agora têm API e persistência; exercícios e prescrição de treinos
+> ainda não têm módulo no servidor.
 
 Diagnóstico em 13/10/2026: PostgreSQL ouvindo na porta 5432; sem
 `backend/.env`. Front e API não estavam ouvindo nas portas padrão antes da

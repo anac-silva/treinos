@@ -1,5 +1,5 @@
 import { S3Storage } from './s3-storage';
-import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 
 describe('adaptador S3', () => {
   const original = { ...process.env };
@@ -21,8 +21,10 @@ describe('adaptador S3', () => {
       const command = send.mock.calls[0][0] as PutObjectCommand;
       expect(command.input).toMatchObject({ Bucket: 'private-test-bucket', Key: 'clients/id/photos/random', ContentType: 'image/png' });
       expect(command.input.ACL).toBeUndefined();
+      await expect(storage.read('clients/id/photos/random')).rejects.toThrow('foto não está disponível');
+      expect(send.mock.calls[1][0]).toBeInstanceOf(GetObjectCommand);
       await storage.remove('clients/id/photos/random');
-      expect(send.mock.calls[1][0]).toBeInstanceOf(DeleteObjectCommand);
+      expect(send.mock.calls[2][0]).toBeInstanceOf(DeleteObjectCommand);
     } finally { storage.onModuleDestroy(); }
   });
 });

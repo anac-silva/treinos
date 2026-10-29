@@ -39,4 +39,13 @@ export class PhotosService {
     catch { throw new ServiceUnavailableException('Não foi possível obter a foto do object storage.'); }
     return { id: photo.id, clientId: photo.clientId, mimeType: photo.mimeType, createdAt: photo.createdAt, updatedAt: photo.updatedAt, url, expiresIn: 300 };
   }
+  async content(clientId: string, storageKey: string) {
+    const photo = await this.database.clientPhoto.findFirst({ where: { clientId, storageKey } });
+    if (!photo) throw new NotFoundException('Foto não encontrada para este cliente.');
+    try {
+      return { buffer: await this.storage.read(storageKey), mimeType: photo.mimeType };
+    } catch {
+      throw new ServiceUnavailableException('Não foi possível ler a foto do armazenamento configurado.');
+    }
+  }
 }
