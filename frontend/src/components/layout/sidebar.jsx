@@ -1,7 +1,7 @@
 import { BsHouseDoor } from "react-icons/bs";
 import { MdOutlinePeopleAlt } from "react-icons/md";
 import { FaRegCalendarCheck } from "react-icons/fa";
-import { FiSettings } from "react-icons/fi";
+import { FiActivity, FiSettings } from "react-icons/fi";
 import logo from "../../assets/logo-removebg-preview.png";
 import { NavLink } from "react-router-dom";
 import { useAuth } from '../../contexts/authContext';
@@ -28,11 +28,15 @@ export function Sidebar() {
                 </NavLink>
                 <NavLink to="/clientes" className="sidebar-link">
                     <MdOutlinePeopleAlt />
-                    <span>Clientes</span>
+                    <span>Alunos</span>
                 </NavLink>
                 <NavLink to="/agendamentos" className="sidebar-link">
                     <FaRegCalendarCheck />
                     <span>Agendamentos</span>
+                </NavLink>
+                <NavLink to="/treinos" className="sidebar-link">
+                    <FiActivity />
+                    <span>Modelos de treino</span>
                 </NavLink>
                 <NavLink to="/configuracoes" className="sidebar-link">
                     <FiSettings /><span>Configurações</span>

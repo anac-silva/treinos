@@ -12,10 +12,12 @@
 .clients-results { position: relative; display: grid; grid-template-rows: minmax(0, 1fr) 64px; flex: 1; min-height: 0; }
 .clients-page .clients-table { table-layout: fixed; align-self: start; }
 .clients-page .clients-table th { height: 40px; background: #f3f2f2; color: #45353b; }
-.clients-table th:first-child { width: 36%; }
-.clients-table th:nth-child(2) { width: 30%; }
+.clients-table th:first-child { width: 30%; }
+.clients-table th:nth-child(2) { width: 26%; }
 .clients-table th:nth-child(3) { width: 18%; }
-.clients-table th:last-child { width: 16%; }
+.clients-table th:last-child { width: 26%; }
+.client-row-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; white-space: normal; }
+.client-delete { padding: 4px 0; border: 0; color: var(--wine); background: transparent; font-size: 12px; cursor: pointer; }
 .clients-page .clients-table td { height: 52px; max-height: 52px; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .clients-table tbody tr:hover { background: #fcf6f7; }
 .clients-table .client-name { display: flex; min-width: 0; align-items: center; color: #45353b; }

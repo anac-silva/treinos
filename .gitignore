@@ -8,3 +8,5 @@ backend/coverage/
 backend/.test-postgres/
 backend/.local-postgres/
 backend/.local-photos/
+.npm-cache/
+.qa-browser/

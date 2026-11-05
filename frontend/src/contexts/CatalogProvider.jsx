@@ -1,46 +1,32 @@
-﻿import { useEffect, useState } from 'react';
+﻿import { useState } from 'react';
 import { CatalogContext } from './catalogContext';
-import { api, allPages } from '../lib/api';
-const key = 'personal-trainer.catalog.v1';
-function loadExercises() {
-  try {
-    const values = JSON.parse(localStorage.getItem(key))?.exercises;
-    if (Array.isArray(values) && values.every((x) => typeof x.id === 'string' && typeof x.name === 'string')) return values;
-  } catch { /* Storage indisponível. */ }
-  return [];
-}
+import { api } from '../lib/api';
+import { useCollection } from '../lib/useCollection';
+
 export default function CatalogProvider({ children }) {
-  const [exercises, setExercises] = useState(loadExercises);
-  const [measurements, setMeasurements] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [revision, setRevision] = useState(0);
-  useEffect(() => {
-    const controller = new AbortController();
-    allPages('/measurement-types', controller.signal).then((items) => {
-      if (!controller.signal.aborted) { setMeasurements(items); setError(''); setLoading(false); }
-    }).catch((error) => { if (!controller.signal.aborted) { setError(error.message); setLoading(false); } });
-    return () => controller.abort();
-  }, [revision]);
+  const exercises = useCollection('/exercises', revision);
+  const measurements = useCollection('/measurement-types', revision);
+  const reload = () => setRevision((value) => value + 1);
   async function register(kind, values) {
     const name = values.name.trim();
     if (!name || name.length > 100) return 'Informe um nome de até 100 caracteres.';
-    if (kind === 'measurements') {
-      const unit = values.unit?.trim();
-      if (!unit || unit.length > 20) return 'Informe uma unidade de até 20 caracteres.';
-      try {
-        const item = await api('/measurement-types', { method: 'POST', body: { name, unit } });
-        setMeasurements((items) => [...items, item]); return null;
-      } catch (error) { return error.message; }
-    }
-    if (exercises.some((item) => item.name.toLocaleLowerCase('pt-BR') === name.toLocaleLowerCase('pt-BR'))) return 'Já existe um exercício com esse nome.';
-    const next = [...exercises, { id: crypto.randomUUID(), name }];
-    try { localStorage.setItem(key, JSON.stringify({ exercises: next })); } catch { return 'Não foi possível salvar neste navegador.'; }
-    setExercises(next); return null;
+    const unit = kind === 'measurements' ? values.unit?.trim() : undefined;
+    if (kind === 'measurements' && (!unit || unit.length > 20)) return 'Informe uma unidade de até 20 caracteres.';
+    try {
+      await api(kind === 'measurements' ? '/measurement-types' : '/exercises', { method: 'POST', body: { name, ...(unit ? { unit } : {}) } });
+      reload();
+      return null;
+    } catch (error) { return error.message; }
   }
   async function updateMeasurement(id, body) {
-    const item = await api('/measurement-types/' + id, { method: 'PATCH', body });
-    setMeasurements((items) => items.map((type) => type.id === id ? item : type));
+    await api('/measurement-types/' + id, { method: 'PATCH', body });
+    reload();
   }
-  return <CatalogContext.Provider value={{ exercises, measurements, register, updateMeasurement, loading, error, reload: () => setRevision((value) => value + 1) }}>{children}</CatalogContext.Provider>;
+  return <CatalogContext.Provider value={{
+    exercises: exercises.data || [], measurements: measurements.data || [],
+    exerciseLoading: exercises.loading, exerciseError: exercises.error,
+    loading: measurements.loading, error: measurements.error,
+    register, updateMeasurement, reload,
+  }}>{children}</CatalogContext.Provider>;
 }

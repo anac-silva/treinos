@@ -1,3 +1,4 @@
+import LegacyCatalogImport from './legacyCatalogImport';
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FiPlus, FiSearch } from "react-icons/fi";
@@ -39,6 +40,8 @@ function CatalogSection({ kind, title, description, withUnit = false }) {
       <label className="search-field catalog-search"><FiSearch aria-hidden="true" /><span className="sr-only">Buscar em {title}</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={`Buscar ${title.toLocaleLowerCase("pt-BR")}...`} /></label>
       {withUnit && catalog.loading && <p role="status">Carregando medições…</p>}
       {withUnit && catalog.error && <p role="alert">{catalog.error} <button type="button" onClick={catalog.reload}>Tentar novamente</button></p>}
+      {!withUnit && catalog.exerciseLoading && <p role="status">Carregando exercícios…</p>}
+      {!withUnit && catalog.exerciseError && <p role="alert">{catalog.exerciseError} <button type="button" onClick={catalog.reload}>Tentar novamente</button></p>}
       <div className="table-wrap"><table className="data-table"><thead><tr><th scope="col">Nome</th>{withUnit && <><th scope="col">Unidade de medida</th><th>Ações</th></>}</tr></thead>
         <tbody>{items.map((item) => <tr key={item.id}><td>{item.name}</td>{withUnit && <><td>{item.unit}</td><td><MeasurementActions item={item} /></td></>}</tr>)}
           {!items.length && <tr><td colSpan={withUnit ? 3 : 1}>Nenhum cadastro encontrado.</td></tr>}
@@ -51,10 +54,11 @@ export default function Configuracoes() {
   return (
     <main className="workspace settings-page">
       <header className="page-heading"><div><h1>Configurações</h1><p>Organize os exercícios e as medições usados nos atendimentos.</p></div></header>
-      <p className="notice-banner">Medições são salvas no servidor. Exercícios permanecem neste navegador enquanto o módulo de treinos aguarda implementação.</p>
-      <CatalogSection kind="exercises" title="Exercícios" description="Cadastre os exercícios disponíveis para seleção." />
+      <p className="notice-banner">Exercícios e medições são salvos no servidor e ficam disponíveis para os treinos e avaliações.</p>
+      <LegacyCatalogImport />
+      <CatalogSection kind="exercises" title="Exercícios" description="Cadastre os exercícios disponíveis para seleção nos treinos." />
       <CatalogSection kind="measurements" title="Medições" description="Defina o que será medido e a unidade de cada medição." withUnit />
-      <div className="settings-links"><Link className="button button-outline" to="/clientes">Selecionar cliente para avaliação</Link></div>
+      <div className="settings-links"><Link className="button button-outline" to="/clientes">Selecionar aluno para avaliação</Link></div>
     </main>
   );
 }

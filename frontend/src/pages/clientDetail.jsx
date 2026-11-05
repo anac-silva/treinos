@@ -2,8 +2,7 @@
 import { evolutionSeries } from '../lib/evolution';
 import ClientPanel from '../components/clientPanel';
 import ClientHeader from '../components/clientHeader';
-import { useEffect, useState } from 'react';
-import { allPages } from '../lib/api';
+import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import ClientTabs from '../components/clientTabs';
 
@@ -40,29 +39,15 @@ function AssessmentHistoryItem({ assessments, clientId }) {
   </article>;
 }
 function HistoryPage({ id, page, setPage }) {
-  const [{ items, loading, error }, setHistory] = useState({ items: [], loading: true, error: '' });
-  useEffect(() => {
-    const controller = new AbortController();
-    allPages(`/clients/${id}/assessments`, controller.signal).then((items) => {
-      if (!controller.signal.aborted) setHistory({ items, loading: false, error: '' });
-    }).catch((error) => {
-      if (!controller.signal.aborted) setHistory({ items: [], loading: false, error: error.message });
-    });
-    return () => controller.abort();
-  }, [id]);
-  if (loading) return <p role="status">Carregando avaliações…</p>;
+  const { data, loading, error } = useRemote(`/clients/${id}/assessments/days?page=${page}&pageSize=10`);
+  if (loading) return <p role="status">Carregando...</p>;
   if (error) return <p role="alert">{error}</p>;
-  const groups = Object.entries(items.reduce((days, assessment) => {
-    const day = assessment.assessedOn.slice(0, 10);
-    (days[day] ||= []).push(assessment);
-    return days;
-  }, {})).sort(([first], [second]) => second.localeCompare(first));
-  const totalPages = Math.max(1, Math.ceil(groups.length / 10));
-  const visibleDays = groups.slice((page - 1) * 10, page * 10);
+  const groups = data.items.map(({ day, assessments }) => [day, assessments]);
+  const totalPages = Math.max(1, Math.ceil(data.total / 10));
   return <>
-    {!items.length && <p className="catalog-empty">Nenhuma avaliação registrada.</p>}
-    <div className="assessment-history-list">{visibleDays.map(([day, assessments]) => <AssessmentHistoryItem key={day} assessments={assessments} clientId={id} />)}</div>
-    <footer className="table-footer assessment-history-footer"><span>{groups.length} {groups.length === 1 ? 'dia com avaliações' : 'dias com avaliações'} · Página {page} de {totalPages}</span><nav className="pagination" aria-label="Paginação das avaliações"><button type="button" className="button button-outline" disabled={page === 1} onClick={() => setPage(page - 1)}>Anterior</button><button type="button" className="button button-outline" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>Próxima</button></nav></footer>
+    {!groups.length && <p className="catalog-empty">Nenhuma avaliação registrada.</p>}
+    <div className="assessment-history-list">{groups.map(([day, assessments]) => <AssessmentHistoryItem key={day} assessments={assessments} clientId={id} />)}</div>
+    <footer className="table-footer assessment-history-footer"><span>{data.total} {data.total === 1 ? 'dia com avaliações' : 'dias com avaliações'} · Página {page} de {totalPages}</span><nav className="pagination" aria-label="Paginação das avaliações"><button type="button" className="button button-outline" disabled={page === 1} onClick={() => setPage(page - 1)}>Anterior</button><button type="button" className="button button-outline" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>Próxima</button></nav></footer>
   </>;
 }
 function AuditToggle(props) {
@@ -94,8 +79,8 @@ function EvolutionData({ id, range }) {
 export default function ClientDetail({ mode }) {
   const { clientId } = useParams();
   const { data: client, loading, error } = useRemote(`/clients/${clientId}`);
-  if (loading) return <main className="workspace" role="status">Carregando cliente…</main>;
-  if (error) return <main className="workspace"><p role="alert">{error}</p><Link to="/clientes">Voltar para clientes</Link></main>;
+  if (loading) return <main className="workspace" role="status">Carregando aluno…</main>;
+  if (error) return <main className="workspace"><p role="alert">{error}</p><Link to="/clientes">Voltar para alunos</Link></main>;
   return <ClientPanel><ClientHeader client={client} /><ClientTabs />
     {mode === 'history' && <History id={clientId} />}
     {mode === 'overview' && <div className="section-heading"><h2>Evolução do aluno</h2><Link className="button button-primary" to={`/clientes/${clientId}/medidas`}>Nova medição</Link></div>}

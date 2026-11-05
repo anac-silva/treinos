@@ -6,7 +6,10 @@ import { useRemote } from '../lib/useRemote';
 import './clientForm.css';
 import ClientTabs from '../components/clientTabs';
 
+const goals = ['Emagrecimento', 'Hipertrofia', 'Condicionamento'];
+
 function Form({ client }) {
+  const preRegistered = client?.status === 'PRE_REGISTERED';
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -15,10 +18,12 @@ function Form({ client }) {
   const [createdId, setCreatedId] = useState(null);
   const [assessmentSaved, setAssessmentSaved] = useState(false);
   const [height, setHeight] = useState(client?.heightCm ? String(Number(client.heightCm) / 100) : '');
+  const [goalChoice, setGoalChoice] = useState(client?.goal && !goals.includes(client.goal) ? 'OTHER' : client?.goal || '');
+  const [customGoal, setCustomGoal] = useState(client?.goal && !goals.includes(client.goal) ? client.goal : '');
   async function submit(event) {
     event.preventDefault(); setBusy(true); setError('');
     const { weightKg, heightM, ...fields } = Object.fromEntries(new FormData(event.currentTarget));
-    const body = { ...fields, age: fields.age === '' ? null : Number(fields.age), heightCm: heightM ? Number((Number(heightM) * 100).toFixed(2)) : null };
+    const body = { ...fields, name: fields.name.trim().toLocaleUpperCase('pt-BR'), age: fields.age === '' ? null : Number(fields.age), heightCm: heightM ? Number((Number(heightM) * 100).toFixed(2)) : null };
     for (const field of ['email', 'phone', 'goal', 'experienceLevel', 'notes', 'sex']) body[field] = body[field].trim() || null;
     let savedId = client?.id || createdId;
     try {
@@ -35,7 +40,7 @@ function Form({ client }) {
         await api(`/clients/${savedId}/photo`, { method: 'POST', body: upload });
       }
       navigate(`/clientes/${savedId}/visaogeral`);
-    } catch (requestError) { setError((savedId && !client ? 'Cliente cadastrado. Não foi possível concluir a avaliação ou a foto. Tente salvar novamente: ' : '') + requestError.message); } finally { setBusy(false); }
+    } catch (requestError) { setError((savedId && !client ? 'Aluno cadastrado. Não foi possível concluir a avaliação ou a foto. Tente salvar novamente: ' : '') + requestError.message); } finally { setBusy(false); }
   }
   function selectPhoto(event) {
     const file = event.target.files[0];
@@ -45,8 +50,8 @@ function Form({ client }) {
     const reader = new FileReader(); reader.onload = () => setPreview(reader.result); reader.readAsDataURL(file);
   }
   return <main className="workspace client-editor-page"><div className="client-editor-card">
-    <Link to="/clientes" className="back-link"><FiArrowLeft aria-hidden="true" />Voltar para Clientes</Link>
-    <header className="new-client-heading"><div><h1>{client ? 'Editar cliente' : 'Novo Cliente'}</h1><p>{client ? 'Atualize os dados do aluno.' : 'Preencha os dados para cadastrar um novo aluno.'}</p></div>
+    <Link to="/clientes" className="back-link"><FiArrowLeft aria-hidden="true" />Voltar para Alunos</Link>
+    <header className="new-client-heading"><div><h1>{preRegistered ? 'Completar cadastro' : client ? 'Editar aluno' : 'Novo Aluno'}</h1><p>{preRegistered ? 'Complete os dados para tornar este contato um aluno ou mantenha o pré-cadastro.' : client ? 'Atualize os dados do aluno.' : 'Preencha os dados para cadastrar um novo aluno.'}</p></div>
       <label className="client-photo-picker"><span className="client-photo-circle">{preview ? <img src={preview} alt="Prévia da foto selecionada" /> : <FiCamera aria-hidden="true" />}</span><span>{photo ? 'Trocar foto' : 'Adicionar foto'}</span><input className="sr-only" type="file" accept="image/jpeg,image/png,image/webp" disabled={busy} onChange={selectPhoto} /></label>
     </header>
     {error && <p role="alert" className="catalog-error">{error}</p>}
@@ -59,18 +64,25 @@ function Form({ client }) {
       <label className="field">Altura (m)<input name="heightM" type="number" min="0.01" max="3" step="0.01" placeholder="Ex.: 1,75" value={height} onChange={(event) => setHeight(event.target.value)} /></label>
       <label className="field client-email">E-mail<input name="email" type="email" maxLength={254} autoComplete="email" placeholder="exemplo@email.com" defaultValue={client?.email || ''} /></label>
       <label className="field">Telefone<input name="phone" type="tel" maxLength={40} autoComplete="tel" placeholder="(00) 00000-0000" defaultValue={client?.phone || ''} /></label>
-      <label className="field client-goal">Objetivo principal<input name="goal" list="client-goals" maxLength={100} placeholder="Selecione ou digite o objetivo" defaultValue={client?.goal || ''} /></label>
-      <datalist id="client-goals"><option value="Emagrecimento" /><option value="Hipertrofia" /><option value="Condicionamento" /></datalist>
+      <div className="field client-goal">
+        <label htmlFor="client-goal">Objetivo principal</label>
+        <select id="client-goal" name={goalChoice === 'OTHER' ? undefined : 'goal'} value={goalChoice} onChange={(event) => setGoalChoice(event.target.value)}>
+          <option value="">Selecione o objetivo</option>
+          {goals.map((goal) => <option key={goal} value={goal}>{goal}</option>)}
+          <option value="OTHER">Outro objetivo</option>
+        </select>
+        {goalChoice === 'OTHER' && <><label className="sr-only" htmlFor="client-custom-goal">Informe o objetivo</label><input id="client-custom-goal" name="goal" maxLength={100} placeholder="Informe o objetivo" value={customGoal} onChange={(event) => setCustomGoal(event.target.value)} /></>}
+      </div>
       <label className="field client-level">Nível de experiência<select name="experienceLevel" defaultValue={client?.experienceLevel || ''}><option value="">Selecione o nível</option><option value="Iniciante">Iniciante</option><option value="Intermediário">Intermediário</option><option value="Avançado">Avançado</option></select></label>
-      {client && <label className="field">Status<select name="status" defaultValue={client.status}><option value="ACTIVE">Ativo</option><option value="INACTIVE">Inativo</option></select></label>}
+      {client && <label className="field">Status<select name="status" defaultValue={preRegistered ? 'ACTIVE' : client.status}><option value="ACTIVE">Ativo</option><option value="INACTIVE">Inativo</option>{preRegistered && <option value="PRE_REGISTERED">Manter pré-cadastro</option>}</select></label>}
       <label className="field full-field">Observações<textarea name="notes" maxLength={5000} rows="4" placeholder="Informações adicionais sobre o aluno…" defaultValue={client?.notes || ''} /></label>
-      <div className="form-actions full-field"><Link className="button button-outline" to={client ? `/clientes/${client.id}/visaogeral` : '/clientes'}>Cancelar</Link><button disabled={busy} className="button button-primary button-dark">{busy ? 'Salvando…' : 'Salvar cliente'}</button></div>
+      <div className="form-actions full-field"><Link className="button button-outline" to={client ? `/clientes/${client.id}/visaogeral` : '/clientes'}>Cancelar</Link><button disabled={busy} className="button button-primary button-dark">{busy ? 'Salvando…' : 'Salvar aluno'}</button></div>
     </form>
   </div></main>;
 }
 function Edit({ id }) {
   const { data, loading, error } = useRemote(`/clients/${id}`);
-  if (loading) return <main className="workspace" role="status">Carregando cliente…</main>;
+  if (loading) return <main className="workspace" role="status">Carregando aluno…</main>;
   if (error) return <main className="workspace"><p role="alert">{error}</p></main>;
   return <Form client={data} />;
 }

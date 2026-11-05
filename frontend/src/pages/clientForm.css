@@ -97,6 +97,11 @@
 .assessment-measurement-list h3 { margin: 0 0 16px; color: var(--wine); font-size: 17px; font-weight: 600; }
 .client-editor-card .assessment-measurement-field { display: grid; grid-template-columns: minmax(0, 1fr) minmax(90px, 120px); align-items: center; gap: 12px; margin-bottom: 10px; }
 .assessment-measurement-field span { overflow-wrap: anywhere; }
+.client-editor-card .assessment-measurement-comparison,
+.assessment-measurement-columns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(65px, 100px) minmax(80px, 120px); align-items: center; gap: 12px; }
+.assessment-measurement-columns { margin-bottom: 10px; color: var(--muted); font-size: 11px; }
+.assessment-comparison-date { margin: -6px 0 16px; color: var(--muted); font-size: 12px; }
+.assessment-previous-value { color: var(--muted); font-variant-numeric: tabular-nums; }
 .client-editor-card .assessment-measurement-field input { height: 40px; }
 @container client-editor (max-width: 680px) {
   .assessment-measurements { grid-template-columns: minmax(0, 1fr); gap: 20px; }

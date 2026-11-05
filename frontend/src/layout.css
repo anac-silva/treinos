@@ -1,0 +1,170 @@
+/* Shared layout, loaded after page styles so every route uses the same rhythm. */
+:root {
+  --content-width: 1440px;
+  --page-gutter: clamp(24px, 2.2vw, 36px);
+  --page-top: 24px;
+  --section-gap: 20px;
+  --control-height: 40px;
+  --panel-radius: 10px;
+}
+.status-awaiting { color: #895407; background: #fff1d4; }
+.assessment-draft-status { margin: -6px 0 16px; color: var(--muted); font-size: 12px; }
+.assessment-measurement-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+.workspace .assessment-measurement-heading h3 { margin: 0; }
+.workspace .assessment-measurement-heading .button { min-height: 32px; padding: 0 10px; font-size: 11px; }
+.workspace .appointment-actions { flex-wrap: wrap; }
+
+.app-layout > .workspace {
+  width: 100%;
+  max-width: calc(var(--content-width) + 2 * var(--page-gutter));
+  margin: 0 auto;
+  padding: var(--page-top) var(--page-gutter) 28px;
+  background: var(--paper);
+  scrollbar-gutter: stable;
+  overscroll-behavior: contain;
+}
+
+/* Client pages share the page inset; their wrapper adds no second margin. */
+.workspace.client-editor-page { container-type: inline-size; container-name: client-editor; }
+.workspace .client-editor-card {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.workspace .back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px;
+  color: var(--wine);
+  font-size: 12px;
+  text-decoration: none;
+}
+.workspace .page-heading,
+.workspace .new-client-heading {
+  align-items: center;
+  gap: 16px;
+  margin: 0 0 var(--section-gap);
+}
+.workspace .new-client-heading { padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+.workspace .page-heading h1,
+.workspace .new-client-heading h1,
+.workspace .client-data-identity h1 { font-size: 26px; line-height: 1.25; letter-spacing: -.5px; }
+.workspace .page-heading p,
+.workspace .new-client-heading p { margin: 5px 0 0; font-size: 13px; line-height: 1.5; }
+
+.workspace :is(input, select, textarea, button, a):focus-visible { outline: 2px solid var(--wine); outline-offset: 2px; }
+.workspace .form-actions { margin-top: 4px; padding-top: 16px; gap: 12px; border-top: 1px solid var(--line); }
+.workspace .form-actions .button { min-width: 136px; }
+
+/* Six tracks keep related fields aligned without empty half rows. */
+.workspace .client-editor-card .client-form-layout { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px 18px; }
+.workspace .client-form-layout > .field,
+.workspace .client-editor-card .client-edit-fields > .field { grid-column: span 2; }
+.workspace .client-form-layout:not(.client-edit-fields) > :is(.client-goal, .client-level) { grid-column: span 3; }
+.workspace .client-form-layout > .full-field,
+.workspace .client-editor-card .client-edit-fields > .full-field { grid-column: 1 / -1; }
+.workspace .client-photo-circle { width: 56px; height: 56px; }
+
+.workspace .client-data-header { padding-bottom: 16px; margin-bottom: 0; }
+.workspace .client-data-top { gap: 14px; }
+.workspace .client-data-avatar { width: 56px; height: 56px; flex-basis: 56px; font-size: 20px; }
+.workspace .client-data-details { margin-top: 14px; gap: 10px 18px; }
+.workspace .client-data-notes { margin-top: 10px; }
+.workspace .profile-tabs { margin: 0 0 var(--section-gap); }
+.workspace .profile-tab { min-height: 44px; }
+.workspace .workout-client-heading { margin-top: 0; }
+.workspace .client-profile-panel > h2 { margin-bottom: 16px; font-size: 22px; }
+
+.workspace .settings-section,
+.workspace .client-profile-panel > .settings-section {
+  margin: 0 0 var(--section-gap);
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--panel-radius);
+  background: #fff;
+  box-shadow: 0 2px 8px #580b1e04;
+}
+.workspace .section-heading,
+.workspace .client-profile-panel .section-heading { margin: 0 0 14px; gap: 12px; }
+.workspace .section-heading h2,
+.workspace .settings-section > h2 { font-size: 19px; }
+.workspace .catalog-form { gap: 12px; margin-bottom: 16px; }
+.workspace .settings-section h3 { margin: 14px 0 10px; font-size: 15px; }
+.workspace .workout-editor-section form { gap: 14px; }
+.workspace .workout-fields { gap: 14px 18px; }
+.workspace .workout-editor-section .exercise-title { margin: 0; }
+.workspace .workout-editor-section .exercise-title h3 { margin: 0; font-size: 15px; }
+.workspace .workout-editor-section .catalog-empty { margin: 0; }
+.workspace .workout-exercise-list:empty { display: none; }
+.workspace .workout-form-actions { justify-content: flex-end; }
+.workspace .assessment-measurements { grid-template-columns: minmax(220px, .8fr) minmax(0, 1.2fr); gap: 24px; }
+.workspace .assessment-body-image { max-width: 225px; max-height: 330px; }
+.workspace .assessment-body-guide { padding: 0 12px; }
+.workspace.assessment-editor-page .field textarea[name="notes"] { height: 44px; min-height: 44px; padding: 8px 12px; }
+@media (min-width: 1100px) {
+  .app-layout > .assessment-editor-page { padding-top: 18px; padding-bottom: 18px; }
+  .assessment-editor-page .back-link { margin-bottom: 12px; }
+  .assessment-editor-page .client-data-header { padding-bottom: 12px; }
+  .assessment-editor-page .client-data-details { margin-top: 10px; }
+  .assessment-editor-page .profile-tabs { margin-bottom: 14px; }
+  .assessment-editor-page .client-profile-panel > h2 { margin-bottom: 12px; }
+  .assessment-editor-page .assessment-draft-status { margin-bottom: 10px; }
+  .assessment-editor-page .client-editor-card .client-form-layout { row-gap: 12px; }
+  .assessment-editor-page .assessment-measurements { padding-top: 0; }
+  .assessment-editor-page .assessment-body-image { width: auto; max-width: 100%; max-height: clamp(160px, calc(100dvh - 610px), 260px); }
+  .assessment-editor-page .assessment-measurement-heading { margin-bottom: 12px; }
+  .assessment-editor-page .assessment-comparison-date { margin-bottom: 12px; }
+  .assessment-editor-page .client-editor-card .assessment-measurement-field { margin-bottom: 8px; }
+  .assessment-editor-page .client-editor-card .assessment-measurement-field input { height: 36px; }
+  .assessment-editor-page .form-actions { padding-top: 12px; margin-top: 0; }
+}
+.workspace .assessment-history-row { min-height: 56px; }
+.workspace .stats-grid { gap: 16px; margin-bottom: var(--section-gap); }
+.workspace .stat-card { min-height: 108px; padding: 18px 20px; }
+.workspace .stat-card strong { font-size: 32px; }
+.workspace .stat-card span { font-size: 15px; }
+.workspace .dashboard-stat:has(.dashboard-week-summary) { flex-wrap: wrap; gap: 12px; }
+.workspace .dashboard-stat > .dashboard-week-summary { display: flex; flex: 0 0 100%; flex-wrap: wrap; gap: 6px 14px; padding-top: 10px; border-top: 1px solid var(--line); }
+.workspace .dashboard-week-summary span { max-width: none; color: var(--muted); font-size: 11px; }
+.workspace .dashboard-week-summary b { margin-left: 3px; color: var(--wine); font-variant-numeric: tabular-nums; }
+
+@container client-editor (max-width: 680px) {
+  .workspace .client-editor-card .client-form-layout { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  .workspace .client-form-layout > .field,
+  .workspace .client-editor-card .client-edit-fields > .field,
+  .workspace .client-form-layout:not(.client-edit-fields) > :is(.client-goal, .client-level) { grid-column: span 1; }
+  .workspace .client-form-layout > .full-field,
+  .workspace .client-editor-card .client-edit-fields > .full-field { grid-column: 1 / -1; }
+  .workspace .assessment-measurements { grid-template-columns: minmax(0, 1fr); }
+  .workspace .assessment-body-image { max-height: 240px; }
+}
+
+@media (max-width: 760px) {
+  :root { --page-gutter: 18px; --page-top: 20px; --section-gap: 16px; }
+  .workspace .page-heading h1,
+  .workspace .new-client-heading h1,
+  .workspace .client-data-identity h1 { font-size: 23px; }
+  .workspace .settings-section,
+  .workspace .client-profile-panel > .settings-section { padding: 16px; }
+  .workspace .client-data-top { flex-wrap: wrap; }
+  .workspace .client-data-top > .button { width: 100%; }
+  .workspace .client-data-details { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .workspace .field input,
+  .workspace .field select,
+  .workspace .field textarea { font-size: 16px; }
+  .workspace .form-actions { flex-wrap: wrap; }
+  .workspace .form-actions .button { min-width: 0; }
+}
+
+@container client-editor (max-width: 440px) {
+  .workspace .client-editor-card .client-form-layout { grid-template-columns: minmax(0, 1fr); }
+  .workspace .client-editor-card .client-form-layout > .field { grid-column: 1 / -1; }
+  .workspace .form-actions { flex-direction: column-reverse; }
+  .workspace .form-actions .button { width: 100%; }
+}

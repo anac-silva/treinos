@@ -1,5 +1,5 @@
 ﻿import { Routes, Route, Navigate, Outlet, useParams } from 'react-router-dom';
-import { Sidebar } from './layout/sidebar';
+import { Sidebar } from '../components/layout/sidebar';
 import AuthProvider from '../contexts/AuthProvider';
 import { useAuth } from '../contexts/authContext';
 import CatalogProvider from '../contexts/CatalogProvider';
@@ -10,8 +10,8 @@ import ClientDetail from '../pages/clientDetail';
 import AssessmentForm from '../pages/assessmentForm';
 import Configuracoes from '../pages/configuracoes/configuracoes';
 import Dashboard from '../pages/dashboard';
-import Unsupported from '../pages/unsupported';
 import Agendamentos from '../pages/agendamentos/agendamentos';
+import WorkoutsPage from '../pages/workouts/workoutWorkspace';
 function Protected() {
   const { user, loading } = useAuth();
   if (loading) return <main className="workspace" role="status">Verificando sessão…</main>;
@@ -26,7 +26,7 @@ function ClientRoute({ mode }) {
   if (mode === 'assessment') return <AssessmentForm key={clientId + (assessmentId || 'new')} />;
   return <ClientDetail key={clientId + mode} mode={mode} />;
 }
-export default function Body() {
+export default function AppRoutes() {
   return <AuthProvider><Routes>
     <Route path="/login" element={<AuthPage />} />
     <Route element={<Protected />}>
@@ -40,7 +40,8 @@ export default function Body() {
       <Route path="/clientes/:clientId/medidas" element={<ClientRoute mode="assessment" />} />
       <Route path="/clientes/:clientId/novaavaliacao" element={<ClientRoute mode="new-assessment" />} />
       <Route path="/clientes/:clientId/avaliacoes/:assessmentId/corrigir" element={<ClientRoute mode="assessment" />} />
-      <Route path="/clientes/:clientId/treinos" element={<Unsupported kind="treinos" />} />
+      <Route path="/clientes/:clientId/treinos" element={<WorkoutsPage />} />
+      <Route path="/treinos" element={<WorkoutsPage />} />
       <Route path="/configuracoes" element={<Configuracoes />} />
       <Route path="/agendamentos" element={<Agendamentos />} />
       <Route path="/agendamentos/novoagendamento" element={<Navigate to="/agendamentos" replace />} />
@@ -49,7 +50,6 @@ export default function Body() {
     </Route>
   </Routes></AuthProvider>;
 }
-
 
 
 

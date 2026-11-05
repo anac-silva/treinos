@@ -10,7 +10,7 @@ export default function ClientTabs() {
     { path: 'treinos', label: 'Treinos', Icon: FiActivity, related: [] },
     { path: 'historico', label: 'Histórico', Icon: FiClock, related: assessmentId ? [`avaliacoes/${assessmentId}/corrigir`] : [] },
   ];
-  return <nav className="profile-tabs" aria-label="Dados do cliente">
+  return <nav className="profile-tabs" aria-label="Dados do aluno">
     {tabs.map(({ path, label, Icon, related }) => <NavLink key={path} to={`/clientes/${clientId}/${path}`} className={({ isActive }) => 'profile-tab' + (isActive || related.some((suffix) => pathname.endsWith('/' + suffix)) ? ' selected' : '')}><Icon aria-hidden="true" />{label}</NavLink>)}
   </nav>;
 }

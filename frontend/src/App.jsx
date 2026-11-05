@@ -1,8 +1,8 @@
 import './App.css'
-import Body from './components/body';
+import AppRoutes from './app/routes';
 
 function App() {
-  return <Body/>
+  return <AppRoutes />
 }
 
 export default App;
