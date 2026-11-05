@@ -9,7 +9,7 @@ export default function SheetEditor({ client, source, library, exercises, onClos
   const initialLevel = { Iniciante: 'BASIC', Intermediário: 'INTERMEDIATE', Avançado: 'ADVANCED' }[client?.experienceLevel] || 'BASIC';
   const [title, setTitle] = useState(source?.title || '');
   const [notes, setNotes] = useState(source?.notes || '');
-  const [blocks, setBlocks] = useState(() => source?.blocks.map((block) => blockDraft(block)) || [blockDraft(null, initialLevel)]);
+  const [blocks, setBlocks] = useState(() => source?.blocks.map((block) => blockDraft(block)) || []);
   const [active, setActive] = useState(0);
   const [picker, setPicker] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -20,8 +20,6 @@ export default function SheetEditor({ client, source, library, exercises, onClos
     if (picker === 'replace') {
       if ((block.title || block.exercises.length) && !window.confirm('Substituir este bloco pelo modelo selecionado? Os outros treinos serão mantidos.')) return;
       updateBlock(blockDraft(template));
-    } else if (blocks.length === 1 && !blocks[0].title && !blocks[0].exercises.length) {
-      setBlocks([blockDraft(template)]); setActive(0);
     } else {
       if (blocks.length >= 26) return;
       setBlocks([...blocks, blockDraft(template)]); setActive(blocks.length);
@@ -30,6 +28,7 @@ export default function SheetEditor({ client, source, library, exercises, onClos
   }
   async function submit(event) {
     event.preventDefault(); setError('');
+    if (!blocks.length) { setError('Adicione um treino vazio ou um modelo de bloco antes de salvar a ficha.'); return; }
     const invalid = blocks.findIndex((item) => !item.title.trim() || !item.exercises.length || item.exercises.some((exercise) => !exercise.repetitions.trim() || !Number.isInteger(Number(exercise.sets)) || Number(exercise.sets) < 1 || Number(exercise.sets) > 30 || (exercise.restSeconds !== '' && (!Number.isInteger(Number(exercise.restSeconds)) || Number(exercise.restSeconds) < 0 || Number(exercise.restSeconds) > 3600))));
     if (invalid !== -1) { setActive(invalid); setError(`Confira o treino ${blockLetter(invalid)}: informe nome e pelo menos um exercício com séries e repetições válidas.`); return; }
     setBusy(true);
@@ -46,20 +45,20 @@ export default function SheetEditor({ client, source, library, exercises, onClos
       <details className="block-notes"><summary>Orientações gerais da ficha</summary><label className="field"><span className="sr-only">Orientações gerais da ficha</span><textarea maxLength={5000} value={notes} onChange={(event) => setNotes(event.target.value)} /></label></details>
       <div className="sheet-toolbar"><button type="button" className="button button-outline" disabled={blocks.length >= 26} onClick={() => { setBlocks([...blocks, blockDraft(null, initialLevel)]); setActive(blocks.length); setPicker(null); }}><FiPlus />Treino vazio</button><button type="button" className="button button-outline" disabled={blocks.length >= 26} onClick={() => setPicker(picker === 'add' ? null : 'add')}><FiCopy />Adicionar modelo de bloco</button><span className="settings-count">{blocks.length} treino(s) nesta ficha</span></div>
       {picker === 'add' && <TemplatePicker templates={library.templates} onChoose={chooseTemplate} />}
-      <div className="sheet-block-tabs" role="tablist" aria-label="Treinos da ficha">{blocks.map((item, index) => <button type="button" role="tab" id={`sheet-tab-${item.localId}`} aria-selected={active === index} aria-controls={`sheet-panel-${item.localId}`} className={active === index ? 'selected' : ''} key={item.localId} onClick={() => { setActive(index); setPicker(null); }}>Treino {blockLetter(index)}<small>{item.title || 'Sem nome'}</small></button>)}</div>
-      <div className="sheet-block-editor" role="tabpanel" id={`sheet-panel-${block.localId}`} aria-labelledby={`sheet-tab-${block.localId}`}>
+      {blocks.length > 0 && <div className="sheet-block-tabs" role="tablist" aria-label="Treinos da ficha">{blocks.map((item, index) => <button type="button" role="tab" id={`sheet-tab-${item.localId}`} aria-selected={active === index} aria-controls={`sheet-panel-${item.localId}`} className={active === index ? 'selected' : ''} key={item.localId} onClick={() => { setActive(index); setPicker(null); }}>Treino {blockLetter(index)}<small>{item.title || 'Sem nome'}</small></button>)}</div>}
+      {block && <div className="sheet-block-editor" role="tabpanel" id={`sheet-panel-${block.localId}`} aria-labelledby={`sheet-tab-${block.localId}`}>
         <div className="sheet-block-heading"><h3>Treino {blockLetter(active)}</h3><div className="sheet-toolbar">
           <MoveButtons index={active} count={blocks.length} label={`treino ${blockLetter(active)}`} onMove={(direction) => { setBlocks(moveItem(blocks, active, direction)); setActive(active + direction); setPicker(null); }} />
           <button type="button" className="button button-outline" onClick={() => setPicker(picker === 'replace' ? null : 'replace')}>Substituir por modelo</button>
-          <button type="button" className="button button-outline" disabled={blocks.length === 1} onClick={() => {
+          <button type="button" className="button button-outline" onClick={() => {
             if (!window.confirm(`Remover o treino ${blockLetter(active)} desta ficha?`)) return;
             setBlocks(blocks.filter((_, index) => index !== active)); setActive(Math.max(0, active - 1)); setPicker(null);
           }}><FiTrash2 />Remover bloco</button>
         </div></div>
         {picker === 'replace' && <TemplatePicker templates={library.templates} label="Substituir este bloco" onChoose={chooseTemplate} />}
         <BlockFields key={block.localId} block={block} onChange={updateBlock} exercises={exercises} />
-      </div>
-      <div className="form-actions"><button type="button" className="button button-outline" onClick={onClose}>Cancelar</button><button className="button button-primary">{busy ? 'Salvando…' : client ? 'Salvar ficha e definir como atual' : 'Salvar modelo de ficha'}</button></div>
+      </div>}
+      <div className="form-actions"><button type="button" className="button button-outline" onClick={onClose}>Cancelar</button><button className="button button-primary" disabled={!blocks.length}>{busy ? 'Salvando…' : client ? 'Salvar ficha e definir como atual' : 'Salvar modelo de ficha'}</button></div>
     </fieldset></form>
   </section>;
 }
