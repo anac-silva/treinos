@@ -12,12 +12,15 @@ export class AppointmentsService {
     const hasClient = Boolean(dto.clientId);
     const hasAnyGuestContact = Boolean(dto.guestName || dto.guestPhone);
     if ((hasClient && hasAnyGuestContact) || (!hasClient && (!dto.guestName || !dto.guestPhone))) {
-      throw new BadRequestException('Informe um cliente cadastrado ou o nome e telefone do pré-cadastro.');
+      throw new BadRequestException('Informe um aluno cadastrado ou o nome e telefone do pré-cadastro.');
     }
     if (dto.clientId) await this.clients.require(dto.clientId);
-    return this.database.appointment.create({
-      data: { ...dto, startsAt: new Date(dto.startsAt) },
-      include: { client: { select: { id: true, name: true, status: true } } },
+    return this.database.$transaction(async (tx) => {
+      const contact = !hasClient ? await this.clients.preRegister(tx, dto.guestName!, dto.guestPhone!) : null;
+      return tx.appointment.create({
+        data: { ...dto, clientId: contact?.id || dto.clientId, guestName: null, guestPhone: null, startsAt: new Date(dto.startsAt) },
+        include: { client: { select: { id: true, name: true, status: true } } },
+      });
     });
   }
 
@@ -27,7 +30,7 @@ export class AppointmentsService {
     }
     const where: Prisma.AppointmentWhereInput = {
       clientId: query.clientId,
-      status: query.status,
+      status: query.status || (query.includePending === 'false' ? { not: 'PENDING_CONFIRMATION' } : undefined),
       startsAt: query.from || query.to ? {
         gte: query.from ? new Date(query.from) : undefined,
         lte: query.to ? new Date(query.to) : undefined,
@@ -52,20 +55,23 @@ export class AppointmentsService {
     const guestPhone = dto.guestPhone !== undefined ? dto.guestPhone : appointment.guestPhone;
     if (clientId) {
       if (dto.clientId) await this.clients.require(dto.clientId);
-      if (guestName || guestPhone) throw new BadRequestException('O agendamento não pode ter cliente cadastrado e pré-cadastro ao mesmo tempo.');
+      if (guestName || guestPhone) throw new BadRequestException('O agendamento não pode ter aluno cadastrado e pré-cadastro ao mesmo tempo.');
     } else if (!guestName?.trim() || !guestPhone?.trim()) {
       throw new BadRequestException('Informe o nome e telefone do pré-cadastro.');
     }
     const { startsAt, ...fields } = dto;
-    return this.database.appointment.update({
-      where: { id }, data: {
-        ...fields,
-        clientId,
-        guestName: clientId ? null : guestName,
-        guestPhone: clientId ? null : guestPhone,
-        startsAt: startsAt ? new Date(startsAt) : undefined,
-      },
-      include: { client: { select: { id: true, name: true, status: true } } },
+    return this.database.$transaction(async (tx) => {
+      const contact = !clientId ? await this.clients.preRegister(tx, guestName!, guestPhone!) : null;
+      return tx.appointment.update({
+        where: { id }, data: {
+          ...fields,
+          clientId: contact?.id || clientId,
+          guestName: null,
+          guestPhone: null,
+          startsAt: startsAt ? new Date(startsAt) : undefined,
+        },
+        include: { client: { select: { id: true, name: true, status: true } } },
+      });
     });
   }
 }

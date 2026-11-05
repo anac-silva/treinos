@@ -26,12 +26,20 @@ model User {
 enum ClientStatus {
   ACTIVE
   INACTIVE
+  PRE_REGISTERED
 }
 
 enum AppointmentStatus {
+  PENDING_CONFIRMATION
   SCHEDULED
   COMPLETED
   CANCELLED
+}
+
+enum WorkoutLevel {
+  BASIC
+  INTERMEDIATE
+  ADVANCED
 }
 
 model Client {
@@ -51,14 +59,83 @@ model Client {
   assessments     Assessment[]
   photos          ClientPhoto[]
   appointments    Appointment[]
+  workouts        WorkoutPlan[]
+  workoutSheets   WorkoutSheet[]
 
   @@index([status, name])
+}
+
+model Exercise {
+  id        String            @id @default(uuid()) @db.Uuid
+  name      String            @db.VarChar(100)
+  nameKey   String            @unique @db.VarChar(100)
+  createdAt DateTime          @default(now()) @db.Timestamptz(3)
+  workouts  WorkoutExercise[]
+
+  @@index([name])
+}
+
+model WorkoutPlan {
+  id           String            @id @default(uuid()) @db.Uuid
+  clientId     String?           @db.Uuid
+  client       Client?           @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  sourcePlanId String?           @db.Uuid
+  sheetId      String?           @db.Uuid
+  sheet        WorkoutSheet?     @relation(fields: [sheetId], references: [id], onDelete: Restrict)
+  position     Int               @default(0)
+  focus        String?           @db.VarChar(100)
+  sourcePlan   WorkoutPlan?      @relation("WorkoutCopies", fields: [sourcePlanId], references: [id], onDelete: SetNull)
+  copies       WorkoutPlan[]     @relation("WorkoutCopies")
+  title        String            @db.VarChar(100)
+  level        WorkoutLevel
+  notes        String?
+  isActive     Boolean           @default(false)
+  createdAt    DateTime          @default(now()) @db.Timestamptz(3)
+  exercises    WorkoutExercise[]
+
+  @@index([clientId, isActive, createdAt])
+  @@index([level, createdAt])
+  @@unique([sheetId, position])
+}
+
+model WorkoutSheet {
+  id            String         @id @default(uuid()) @db.Uuid
+  clientId      String?        @db.Uuid
+  client        Client?        @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  title         String         @db.VarChar(100)
+  notes         String?
+  isActive      Boolean        @default(false)
+  sourceSheetId String?        @db.Uuid
+  sourceSheet   WorkoutSheet?   @relation("SheetCopies", fields: [sourceSheetId], references: [id], onDelete: SetNull)
+  copies        WorkoutSheet[]  @relation("SheetCopies")
+  blocks        WorkoutPlan[]
+  createdAt     DateTime        @default(now()) @db.Timestamptz(3)
+
+  @@index([clientId, isActive, createdAt])
+}
+
+model WorkoutExercise {
+  id            String      @id @default(uuid()) @db.Uuid
+  workoutPlanId String      @db.Uuid
+  workoutPlan   WorkoutPlan @relation(fields: [workoutPlanId], references: [id], onDelete: Cascade)
+  exerciseId    String      @db.Uuid
+  exercise      Exercise    @relation(fields: [exerciseId], references: [id], onDelete: Restrict)
+  position      Int
+  sets          Int
+  repetitions   String      @db.VarChar(40)
+  restSeconds   Int?
+  notes         String?
+
+  @@unique([workoutPlanId, position])
+  @@index([exerciseId])
 }
 
 model Appointment {
   id              String            @id @default(uuid()) @db.Uuid
   clientId        String?           @db.Uuid
   client          Client?           @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  sourceAssessmentId String?        @unique @db.Uuid
+  sourceAssessment Assessment?      @relation(fields: [sourceAssessmentId], references: [id], onDelete: Restrict)
   guestName       String?           @db.VarChar(100)
   guestPhone      String?           @db.VarChar(40)
   startsAt        DateTime          @db.Timestamptz(3)
@@ -99,6 +176,7 @@ model Assessment {
   updatedAt        DateTime                @updatedAt @db.Timestamptz(3)
   measurements     AssessmentMeasurement[]
   corrections      AssessmentCorrection[]
+  nextAppointment  Appointment?
 
   @@index([clientId, assessedOn, createdAt])
 }
@@ -159,4 +237,3 @@ model Session {
   @@index([userId, revokedAt])
   @@index([expiresAt])
 }
-

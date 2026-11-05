@@ -33,7 +33,7 @@ export class PhotosService {
   async principal(clientId: string) {
     await this.clients.require(clientId);
     const photo = await this.database.clientPhoto.findFirst({ where: { clientId, principal: true } });
-    if (!photo) throw new NotFoundException('Cliente sem foto principal.');
+    if (!photo) throw new NotFoundException('Aluno sem foto principal.');
     let url: string;
     try { url = await this.storage.readUrl(photo.storageKey); }
     catch { throw new ServiceUnavailableException('Não foi possível obter a foto do object storage.'); }
@@ -41,7 +41,7 @@ export class PhotosService {
   }
   async content(clientId: string, storageKey: string) {
     const photo = await this.database.clientPhoto.findFirst({ where: { clientId, storageKey } });
-    if (!photo) throw new NotFoundException('Foto não encontrada para este cliente.');
+    if (!photo) throw new NotFoundException('Foto não encontrada para este aluno.');
     try {
       return { buffer: await this.storage.read(storageKey), mimeType: photo.mimeType };
     } catch {

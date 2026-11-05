@@ -1,4 +1,4 @@
-import { IsDateString, IsEnum, IsInt, IsOptional, IsString, IsUUID, Length, Matches, Max, MaxLength, Min, ValidateIf } from 'class-validator';
+import { IsDateString, IsEnum, IsIn, IsInt, IsOptional, IsString, IsUUID, Length, Matches, Max, MaxLength, Min, ValidateIf } from 'class-validator';
 import { AppointmentStatus } from '../../generated/prisma/client';
 import { PaginationDto, Trim } from '../../shared/dto';
 
@@ -54,6 +54,8 @@ export class UpdateAppointmentDto {
 }
 
 export class ListAppointmentsDto extends PaginationDto {
+  @IsOptional() @IsIn(['true', 'false'])
+  includePending?: string;
   @IsOptional() @IsDateString() @Matches(zonedDateTime)
   from?: string;
 

@@ -7,6 +7,8 @@ import { AssessmentsModule } from './modules/assessments/assessments.module';
 import { MeasurementsModule } from './modules/measurements/measurements.module';
 import { PhotosModule } from './modules/photos/photos.module';
 import { AppointmentsModule } from './modules/appointments/appointments.module';
+import { ExercisesModule } from './modules/exercises/exercises.module';
+import { WorkoutsModule } from './modules/workouts/workouts.module';
 
-@Module({ imports: [DatabaseModule, UsersModule, AuthModule, ClientsModule, AssessmentsModule, MeasurementsModule, PhotosModule, AppointmentsModule] })
+@Module({ imports: [DatabaseModule, UsersModule, AuthModule, ClientsModule, AssessmentsModule, MeasurementsModule, PhotosModule, AppointmentsModule, ExercisesModule, WorkoutsModule] })
 export class AppModule {}

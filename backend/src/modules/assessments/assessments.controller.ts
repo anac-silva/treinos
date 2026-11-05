@@ -9,6 +9,7 @@ export class AssessmentsController {
   constructor(private readonly service: AssessmentsService) {}
   @Post() create(@Param('clientId', ParseUUIDPipe) clientId: string, @Body() dto: CreateAssessmentDto) { return this.service.create(clientId, dto); }
   @Get() list(@Param('clientId', ParseUUIDPipe) clientId: string, @Query() query: PaginationDto) { return this.service.list(clientId, query); }
+  @Get('days') days(@Param('clientId', ParseUUIDPipe) clientId: string, @Query() query: PaginationDto) { return this.service.listDays(clientId, query); }
   @Get('weight-evolution') weight(@Param('clientId', ParseUUIDPipe) clientId: string, @Query() query: EvolutionQueryDto) { return this.service.weightEvolution(clientId, query); }
   @Get(':id') get(@Param('clientId', ParseUUIDPipe) clientId: string, @Param('id', ParseUUIDPipe) id: string) { return this.service.get(clientId, id); }
   @Post(':id/corrections') correct(@Param('clientId', ParseUUIDPipe) clientId: string, @Param('id', ParseUUIDPipe) id: string, @Req() request: AuthRequest, @Body() dto: CorrectAssessmentDto) { return this.service.correct(clientId, id, request.auth!.user.id, dto); }

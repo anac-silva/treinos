@@ -9,6 +9,7 @@
     "db:status": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/local-db.ps1 status",
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/src/main.js",
+    "prestart:dev": "npm run db:start",
     "start:dev": "node --watch -r ts-node/register src/main.ts",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src prisma test prisma.config.ts",
