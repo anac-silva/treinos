@@ -28,11 +28,11 @@ o e-mail é `personal@treinos.local`.
 
 Para este ambiente de desenvolvimento, o login foi dispensado apenas no
 computador local. `backend/.env` usa `LOCAL_AUTH_BYPASS=true` e
-`treinos/.env.local` usa `VITE_LOCAL_AUTH_BYPASS=true`. A API fica limitada
+`frontend/.env.local` usa `VITE_LOCAL_AUTH_BYPASS=true`. A API fica limitada
 a `127.0.0.1`; não use esse modo em produção, numa rede compartilhada ou num
 computador acessível a outras pessoas. Para voltar a exigir login, defina
 ambas as opções como `false` e reinicie a API e o Vite. A opção do Vite fica
-em `treinos/.env.development.local` e só se aplica ao servidor de desenvolvimento.
+em `frontend/.env.development.local` e só se aplica ao servidor de desenvolvimento.
 
 O acesso inicial com e-mail e senha continua disponível quando o modo local
 está desligado: use `personal@treinos.local` e `INITIAL_PASSWORD` em
@@ -45,20 +45,21 @@ No PowerShell, a partir da raiz:
 
 ```powershell
 cd backend
-npm run db:start
 npm run start:dev
 ```
 
 Em outro terminal, a partir da raiz:
 
 ```powershell
-cd treinos
+cd frontend
 npm run dev
 ```
 
-A configuração não instala um serviço do Windows: o banco deve ser iniciado
-novamente após reiniciar a máquina. `db:start` reconhece uma instância já
-disponível. API já iniciada na porta 3000 não precisa de uma segunda execução.
+O comando `npm run start:dev` inicia o banco automaticamente antes da API,
+inclusive após reiniciar a máquina. Se o banco já estiver disponível, segue
+normalmente; se ele não iniciar, a API não é iniciada. A configuração não
+instala um serviço do Windows. API já iniciada na porta 3000 não precisa de
+uma segunda execução.
 
 Na pasta backend:
 

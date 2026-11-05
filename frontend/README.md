@@ -14,12 +14,13 @@ Na raiz do repositório, em PowerShell:
 
 ```powershell
 npm ci
-cd treinos
+cd frontend
 npm ci
 npm run dev
 ```
 
-Abra http://localhost:5173. As dependências da raiz incluem o plugin Tailwind.
+Abra http://localhost:5173. As dependências do frontend, incluindo Tailwind,
+estão declaradas neste pacote; ele pode ser instalado independentemente da raiz.
 O Vite encaminha `/api` para http://localhost:3000 e remove o prefixo:
 `/api/auth/login` chega à API como `/auth/login`.
 O backend deve permitir a origem exata do navegador em CORS_ORIGINS.
@@ -40,6 +41,9 @@ Use front e API no mesmo site para o cookie SameSite=Lax funcionar.
   objetivo/status, cadastro, edição, inativação e reativação.
 - Agendamentos: cadastro por cliente/data/horário/duração/tipo, consulta por
   período, edição, conclusão e cancelamento; os registros são persistidos no PostgreSQL.
+- Treinos: catálogo compartilhado de exercícios, modelos por nível Básico,
+  Intermediário e Avançado, prescrição para clientes, cópia a partir de modelos
+  ou de outros clientes, séries/repetições/descanso e histórico de versões.
 - Perfil selecionado por ID, sem cliente fixo.
 - Foto principal: envio multipart e consulta autenticada. Em desenvolvimento,
   as imagens ficam privadas no computador local; produção exige S3 configurado.
@@ -48,15 +52,13 @@ Use front e API no mesmo site para o cookie SameSite=Lax funcionar.
   avaliação inicial no perfil (requisições independentes).
 - Histórico paginado, correções com motivo e versão e consulta de auditoria.
 - Evolução de peso e medidas com filtro de datas.
-- Configurações: catálogo de medições vindo do servidor, cadastro, edição,
-  arquivamento e reativação. Histórico preserva nome/unidade originais.
+- Configurações: catálogos de exercícios e medições no servidor; cadastro,
+  edição, arquivamento e reativação de medições. Exercícios legados salvos neste
+  navegador são importados para o banco quando a aplicação carrega.
 
 Rotas de perfil usam `/clientes/:clientId/...`. Os caminhos antigos sem ID
 encaminham à lista para que o usuário selecione um cliente.
 
-O backend ainda não tem módulos de exercícios ou prescrição de treinos; essa
-aba informa a indisponibilidade. O cadastro de exercícios em Configurações
-continua local, com essa limitação informada na tela.
 Tipos de medição antigos no localStorage não são enviados automaticamente
 ao banco: os novos registros usam exclusivamente os IDs reais da API.
 

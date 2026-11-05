@@ -22,4 +22,3 @@ export default function TemplatePicker({ templates, onChoose, label = 'Adicionar
     </div>
   </div>;
 }
-

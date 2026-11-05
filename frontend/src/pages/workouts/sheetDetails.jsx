@@ -20,4 +20,3 @@ export default function SheetCard({ sheet, onCopy, onAdjust, onTemplate }) {
     {block && <div className="sheet-block-preview"><h3>{blockLetter(active)} — {block.title}</h3><p className="catalog-empty">{levelName(block.level)}{block.focus && ` · ${block.focus}`}</p><ExerciseList block={block} /></div>}
   </article>;
 }
-

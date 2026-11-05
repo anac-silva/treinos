@@ -39,4 +39,3 @@ export default function WorkoutLibrary({ library, exercises }) {
     <Link className="text-action" to="/clientes">Selecionar aluno para montar uma ficha</Link>
   </main>;
 }
-

@@ -1,5 +1,7 @@
 # Evolução do sistema de gestão do personal
 
+> Documento historico. Para a estrutura atual e as responsabilidades implementadas, consulte [organizacao-do-projeto.md](organizacao-do-projeto.md).
+
 ## Escopo e estado da etapa
 
 Etapa 1: análise do projeto e definição da arquitetura. Este documento descreve

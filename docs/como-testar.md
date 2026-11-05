@@ -3,10 +3,10 @@
 > Atualização: as telas agora estão conectadas à API para autenticação,
 > clientes, medições, avaliações, histórico, correções, evolução e fotos.
 > O diagnóstico e a tabela abaixo registram o estado anterior à integração.
-> Para execução e teste do estado atual, use o [README do front](../treinos/README.md).
+> Para execução e teste do estado atual, use o [README do front](../frontend/README.md).
 > O banco local agora está configurado; consulte [o guia](banco-local.md).
-> Agendamentos agora têm API e persistência; exercícios e prescrição de treinos
-> ainda não têm módulo no servidor.
+> Agendamentos, catálogo de exercícios e prescrição de treinos têm API e
+> persistência no PostgreSQL.
 
 Diagnóstico em 13/10/2026: PostgreSQL ouvindo na porta 5432; sem
 `backend/.env`. Front e API não estavam ouvindo nas portas padrão antes da
@@ -19,7 +19,7 @@ foram executados nesta verificação, pois não há conexão de teste configurad
 Na raiz do repositório:
 
 ```powershell
-cd treinos
+cd frontend
 npm run dev
 ```
 
@@ -30,16 +30,16 @@ Abra a URL informada pelo Vite, normalmente http://localhost:5173.
 | Início `/` | Abrir e seguir o link da agenda | Conteúdo demonstrativo, sem totais reais |
 | Clientes `/clientes` | Abrir a lista e clicar em Novo cliente | Lista fixa; busca/filtros/paginação sem implementação |
 | Novo cliente `/clientes/novocliente` | Preencher campos | Salvar, cancelar e adicionar foto sem implementação |
-| Configurações `/configuracoes` | Cadastrar exercício e medição com unidade; pesquisar; recarregar | Catálogos persistem no localStorage deste navegador; duplicados são rejeitados |
+| Configurações `/configuracoes` | Cadastrar exercício e medição com unidade; pesquisar; recarregar | Exercícios e medições são persistidos no servidor |
 | Nova avaliação `/clientes/novaavaliacao` | Conferir a medição cadastrada e selecionar exercícios | Campos/seleção demonstrativos; Salvar medidas não grava avaliação |
 | Medidas `/clientes/medidas` | Conferir catálogo e preencher valores | Valores não são persistidos |
-| Treinos `/clientes/treinos` | Adicionar/remover exercícios e alterar prescrição | Rascunho em memória; não salva treino do cliente |
+| Treinos `/clientes/:clientId/treinos` | Criar do zero ou duplicar um treino; adicionar exercícios, séries, repetições e descanso | Nova prescrição vira a atual e mantém a anterior no histórico |
+| Modelos `/treinos` | Criar modelos Básico, Intermediário ou Avançado | Modelos ficam disponíveis para copiar ao prescrever um treino |
 | Visão geral `/clientes/visaogeral` | Abrir e navegar pelas abas | Perfil e evolução ilustrativos |
 | Agenda `/agendamentos` | Abrir Novo agendamento; fechar por botão ou Escape | Modal funciona; Salvar não cria agendamento |
 
-O front não contém chamadas fetch/axios à API nem telas de login/troca de
-senha. Os cadastros locais não são sincronizados com o banco. Agenda, treinos,
-exercícios e PDF ainda não têm módulos correspondentes no backend.
+Consulte os READMEs do front e do backend para os fluxos atuais e seus
+contratos. O PDF ainda não tem módulo correspondente no backend.
 
 ## Banco e API
 
@@ -95,7 +95,7 @@ módulos podem funcionar, mas o armazenamento de fotos fica desabilitado.
 
 ## Verificações automatizadas
 
-Front, dentro de `treinos/`:
+Front, dentro de `frontend/`:
 
 ```powershell
 npm run build

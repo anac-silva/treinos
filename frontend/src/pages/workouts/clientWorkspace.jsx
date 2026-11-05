@@ -33,4 +33,3 @@ export default function ClientWorkspace({ clientId, library, exercises }) {
     </>}
   </ClientPanel>;
 }
-

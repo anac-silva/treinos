@@ -21,4 +21,3 @@ export default function BlockEditor({ source, editing, exercises, onClose, onSav
     </fieldset></form>
   </section>;
 }
-

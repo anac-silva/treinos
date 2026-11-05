@@ -63,4 +63,3 @@ export default function SheetEditor({ client, source, library, exercises, onClos
     </fieldset></form>
   </section>;
 }
-

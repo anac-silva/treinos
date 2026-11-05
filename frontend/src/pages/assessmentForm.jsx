@@ -114,10 +114,3 @@ export default function AssessmentForm() {
   if (error) return <main className="workspace"><p role="alert">{error}</p></main>;
   return assessmentId ? <Correction client={data} id={assessmentId} /> : <NewAssessment key={clientId} client={data} />;
 }
-
-
-
-
-
-
-

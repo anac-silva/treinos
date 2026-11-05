@@ -1,5 +1,7 @@
 # Inventário técnico do front-end para integração
 
+> Documento historico. Para a estrutura atual e as responsabilidades implementadas, consulte [organizacao-do-projeto.md](organizacao-do-projeto.md).
+
 Análise de 06/10/2026. Escopo: arquivos de aplicação, rotas, estilos, assets,
 manifests e configuração do front existente. Dependências instaladas e saída
 gerada em `dist/` não são código de aplicação a integrar. Nenhum código do front

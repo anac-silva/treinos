@@ -1,5 +1,7 @@
 # Configurações de exercícios e medições
 
+> Documento historico. Para a estrutura atual e as responsabilidades implementadas, consulte [organizacao-do-projeto.md](organizacao-do-projeto.md).
+
 ## Uso
 
 Abra **Configurações** pela navegação (`/configuracoes`).
@@ -38,7 +40,7 @@ do nome/unidade da definição, além dos valores, para manter o histórico.
 
 Criados: `contexts/catalogContext.js`, `contexts/CatalogProvider.jsx`,
 `pages/configuracoes/configuracoes.jsx`, `components/catalogMeasurements.jsx`,
-`components/exerciseSelection.jsx` e `components/clientTabs.jsx` (todos em `treinos/src`).
+`components/exerciseSelection.jsx` e `components/clientTabs.jsx` (todos em `frontend/src`).
 
 Alterados: roteador Body, Sidebar, App.css e as quatro páginas em detalhesClientes.
 Atualizada a nota do inventário para distinguir o diagnóstico anterior do estado atual.

@@ -43,4 +43,3 @@ export default function BlockFields({ block, onChange, exercises }) {
     </article>)}</div>
   </div>;
 }
-
