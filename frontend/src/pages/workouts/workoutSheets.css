@@ -3,7 +3,7 @@
 .workspace.workout-page .full-field { grid-column: 1 / -1; }
 .block-fields { display: grid; gap: 14px; min-width: 0; }
 .block-metadata { display: grid; grid-template-columns: minmax(0, 2fr) minmax(120px, .8fr) minmax(0, 1.2fr); gap: 14px; }
-.block-library-filters { display: grid; grid-template-columns: minmax(0, 2fr) minmax(140px, 1fr) minmax(0, 1fr); gap: 12px; margin-bottom: 16px; }
+.block-library-filters { display: grid; grid-template-columns: minmax(0, 2fr) minmax(140px, 1fr); gap: 12px; margin-bottom: 16px; }
 .sheet-toolbar, .workout-row-tools, .workout-move-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .sheet-main-actions { margin-bottom: 18px; }
 .workout-row-tools { flex-shrink: 0; }
@@ -19,6 +19,12 @@
 .sheet-block-heading h3 { margin: 0; color: var(--wine); font-size: 17px; }
 .sheet-block-editor { padding: 16px; border: 1px solid var(--line); border-radius: 10px; background: #fdfbfc; }
 .template-picker { margin-bottom: 14px; padding: 14px; border: 1px dashed #d6bdc5; border-radius: 8px; background: #faf5f7; }
+.template-results { display: grid; gap: 8px; max-height: 360px; overflow-y: auto; margin: 0; padding: 0; list-style: none; }
+.template-result { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+.template-result-info { display: grid; gap: 4px; min-width: 0; font-size: 13px; overflow-wrap: anywhere; }
+.template-result-info strong { color: var(--wine); }
+.template-result-info span { color: var(--muted); }
+.template-result .button { flex-shrink: 0; }
 .sheet-source-list { display: grid; gap: 8px; margin-top: 16px; }
 .block-notes summary, .sheet-history > summary, .workout-card summary { cursor: pointer; color: var(--wine); font-size: 13px; }
 .block-notes .field { margin-top: 10px; }
@@ -34,11 +40,11 @@
   .block-metadata { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .block-metadata > .field:first-child { grid-column: 1 / -1; }
   .block-library-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .block-library-filters > .field:first-child { grid-column: 1 / -1; }
 }
 @media (max-width: 540px) {
   .sheet-block-editor { padding: 12px; }
   .block-metadata, .block-library-filters { grid-template-columns: minmax(0, 1fr); }
   .sheet-toolbar .button { white-space: normal; }
   .sheet-block-tabs > button { flex-basis: 100px; padding: 8px 10px; }
+  .template-result { align-items: stretch; flex-direction: column; gap: 10px; }
 }
