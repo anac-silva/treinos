@@ -75,3 +75,46 @@ test('erro de conexão é legível e cancelamento permanece identificável', asy
   globalThis.fetch = async () => { throw new DOMException('Aborted', 'AbortError'); };
   await assert.rejects(api('/clients'), (error) => error.name === 'AbortError');
 });
+
+test('repete leitura após 502 temporário e retorna dados atualizados', async () => {
+  let calls = 0;
+  globalThis.fetch = async () => ++calls === 1 ? new Response('Bad Gateway', { status: 502 }) : json({ total: 2 });
+  assert.deepEqual(await api('/appointments'), { total: 2 });
+  assert.equal(calls, 2);
+});
+
+test('limita tentativas de leitura e não repete gravações', async () => {
+  let calls = 0;
+  globalThis.fetch = async () => { calls++; return new Response('Bad Gateway', { status: 502 }); };
+  await assert.rejects(api('/appointments'), (error) => error.status === 502);
+  assert.equal(calls, 3);
+  calls = 0;
+  await assert.rejects(api('/appointments', { method: 'POST', body: {} }), (error) => error.status === 502);
+  assert.equal(calls, 1);
+});
+
+test('sair da tela cancela a espera antes da próxima tentativa', async () => {
+  const controller = new AbortController();
+  let calls = 0;
+  globalThis.fetch = async () => { calls++; setTimeout(() => controller.abort(), 10); return new Response('Bad Gateway', { status: 502 }); };
+  await assert.rejects(api('/appointments', { signal: controller.signal }), (error) => error.name === 'AbortError');
+  assert.equal(calls, 1);
+});
+
+test('paginação substitui parâmetros anteriores sem perder os filtros', async () => {
+  globalThis.fetch = async (url) => {
+    const params = new URL(url, 'http://localhost').searchParams;
+    assert.deepEqual(params.getAll('page'), ['1']);
+    assert.deepEqual(params.getAll('pageSize'), ['100']);
+    assert.equal(params.get('status'), 'ACTIVE');
+    return json({ items: [{ id: 1 }], total: 1 });
+  };
+  assert.equal((await allPages('/clients?status=ACTIVE&page=8&pageSize=1')).length, 1);
+});
+
+test('paginação inconsistente falha sem entrar em repetição infinita', async () => {
+  let calls = 0;
+  globalThis.fetch = async () => { calls++; return json({ items: [], total: 100 }); };
+  await assert.rejects(allPages('/clients'), /paginação inválida/);
+  assert.equal(calls, 1);
+});
