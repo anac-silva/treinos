@@ -2,7 +2,7 @@ import { BsHouseDoor } from "react-icons/bs";
 import { MdOutlinePeopleAlt } from "react-icons/md";
 import { FaRegCalendarCheck } from "react-icons/fa";
 import { FiActivity, FiSettings } from "react-icons/fi";
-import logo from "../../assets/logo-removebg-preview.png";
+import logo from "../../assets/Logo de Movimento e Longevidade.png";
 import { NavLink } from "react-router-dom";
 import { useAuth } from '../../contexts/authContext';
 import { localAuthBypass } from '../../lib/api';
@@ -19,7 +19,7 @@ export function Sidebar() {
     return (
         <aside className="sidebar">
            <div className="sidebar-brand">
-                <img src={logo} alt="Leonardo Personal Trainer" />
+                <img src={logo} alt="Leonardo Asevedo — Movimento, Saúde e Longevidade" />
            </div>
            <nav className="sidebar-nav" aria-label="Navegação principal">
                 <NavLink to="/" className="sidebar-link">

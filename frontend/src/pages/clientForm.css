@@ -163,13 +163,6 @@
 /* Compact student overview; retain natural scrolling on smaller screens. */
 .workspace.student-overview-page { padding: 12px 18px; }
 .student-overview-page .client-editor-card { max-width: none; padding: 16px 20px; }
-.student-overview-page .back-link { margin-bottom: 8px; }
-.student-overview-page .client-data-header { padding-bottom: 10px; margin-bottom: 8px; }
-.student-overview-page .client-data-avatar { width: 44px; height: 44px; flex-basis: 44px; font-size: 18px; }
-.student-overview-page .client-data-identity h1 { font-size: 23px; }
-.student-overview-page .client-data-tags { margin-top: 3px; }
-.student-overview-page .client-data-details { margin-top: 8px; gap: 6px 16px; }
-.student-overview-page .profile-tabs { margin-bottom: 8px; }
 .student-overview-page .section-heading { margin: 8px 0; }
 .student-overview-page .section-heading h2 { font-size: 17px; }
 .student-overview-page .button { min-height: 34px; min-width: 0; font-size: 12px; }

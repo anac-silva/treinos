@@ -84,7 +84,7 @@ export default function ClientDetail({ mode }) {
   if (loading) return <main className="workspace" role="status">Carregando aluno…</main>;
   if (error) return <main className="workspace"><p role="alert">{error}</p><Link to="/clientes">Voltar para alunos</Link></main>;
   return <ClientPanel className={mode === 'overview' ? 'student-overview-page' : ''}><ClientHeader client={client} /><ClientTabs />
-    {mode === 'history' && <History id={clientId} />}
+    {mode === 'history' && <><div className="section-heading"><Link className="button button-outline" to={`/clientes/${clientId}/medidas`}>Voltar para medidas</Link><Link className="button button-primary" to={`/clientes/${clientId}/medidas`}>Nova medição</Link></div><History id={clientId} /></>}
     {mode === 'overview' && <div className="section-heading"><h2>Evolução do aluno</h2><Link className="button button-primary" to={`/clientes/${clientId}/medidas`}>Nova medição</Link></div>}
     {mode === 'overview' && <><StudentProgressCards id={clientId} /><Evolution id={clientId} /><StudentOverviewPanels client={client} /></>}
   </ClientPanel>;

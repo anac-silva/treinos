@@ -72,7 +72,7 @@ function AssessmentEditor({ client, assessment, previous, previousLoading, previ
       navigate(`/clientes/${client.id}/visaogeral`);
     } catch (error) { setError(error.message); } finally { setBusy(false); }
   }
-  return <ClientPanel className="assessment-editor-page"><ClientHeader client={client} /><ClientTabs /><h2>{assessment ? 'Corrigir avaliação' : 'Nova medição'}</h2>
+  return <ClientPanel className="assessment-editor-page"><ClientHeader client={client} /><ClientTabs /><div className="section-heading"><h2>{assessment ? 'Corrigir avaliação' : 'Nova medição'}</h2><Link className="button button-outline" to={`/clientes/${client.id}/historico`}>Histórico de avaliações</Link></div>
     {assessment && <p>Versão {assessment.version}. A correção será registrada no histórico de auditoria.</p>}
     {(error || catalogError) && <p role="alert" className="catalog-error">{error || catalogError}</p>}
     {draft.message && <p className={draft.failed ? 'catalog-error' : 'assessment-draft-status'} role={draft.failed ? 'alert' : 'status'}>{draft.message}</p>}

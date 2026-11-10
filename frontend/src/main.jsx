@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 import './layout.css'
+import './components/clientProfile.css'
 import './pages/agendamentos/appointments.css'
 import { BrowserRouter } from 'react-router-dom'
 

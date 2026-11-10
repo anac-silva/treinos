@@ -109,10 +109,6 @@
 .workspace.assessment-editor-page .field textarea[name="notes"] { height: 44px; min-height: 44px; padding: 8px 12px; }
 @media (min-width: 1100px) {
   .app-layout > .assessment-editor-page { padding-top: 18px; padding-bottom: 18px; }
-  .assessment-editor-page .back-link { margin-bottom: 12px; }
-  .assessment-editor-page .client-data-header { padding-bottom: 12px; }
-  .assessment-editor-page .client-data-details { margin-top: 10px; }
-  .assessment-editor-page .profile-tabs { margin-bottom: 14px; }
   .assessment-editor-page .client-profile-panel > h2 { margin-bottom: 12px; }
   .assessment-editor-page .assessment-draft-status { margin-bottom: 10px; }
   .assessment-editor-page .client-editor-card .client-form-layout { row-gap: 12px; }
@@ -172,14 +168,6 @@
 /* Keep the assessment image, notes and measurements together in a compact form. */
 .workspace.assessment-editor-page { padding: 10px 18px; }
 .assessment-editor-page .client-editor-card { max-width: none; padding: 14px 20px; }
-.assessment-editor-page .back-link { margin-bottom: 6px; }
-.assessment-editor-page .client-data-header { padding-bottom: 8px; margin-bottom: 6px; }
-.assessment-editor-page .client-data-avatar { width: 44px; height: 44px; flex-basis: 44px; font-size: 18px; }
-.assessment-editor-page .client-data-identity h1 { font-size: 23px; }
-.assessment-editor-page .client-data-tags { margin-top: 3px; }
-.assessment-editor-page .client-data-details { margin-top: 7px; }
-.assessment-editor-page .client-editor-card .profile-tabs { margin-bottom: 8px; }
-.assessment-editor-page .profile-tab { min-height: 36px; }
 .assessment-editor-page .client-profile-panel > h2 { font-size: 19px; margin-bottom: 6px; }
 .assessment-editor-page .assessment-draft-status { margin: 4px 0 8px; font-size: 11px; }
 .assessment-editor-page .client-editor-card .client-form-layout { row-gap: 10px; }
@@ -210,14 +198,6 @@
 /* Overview overrides follow the shared layout rules to avoid restoring large spacing. */
 .app-layout > .workspace.student-overview-page { --section-gap: 8px; padding: 10px 24px; }
 .workspace.student-overview-page .client-editor-card { padding: 0; }
-.workspace.student-overview-page .back-link { margin-bottom: 6px; }
-.workspace.student-overview-page .client-data-header { padding-bottom: 8px; }
-.workspace.student-overview-page .client-data-avatar { width: 40px; height: 40px; flex-basis: 40px; font-size: 16px; }
-.workspace.student-overview-page .client-data-identity h1 { font-size: 22px; }
-.workspace.student-overview-page .client-data-details { margin-top: 6px; gap: 4px 16px; }
-.workspace.student-overview-page .client-data-details dd { font-size: 12px; }
-.workspace.student-overview-page .profile-tabs { margin-bottom: 8px; }
-.workspace.student-overview-page .profile-tab { min-height: 34px; }
 .workspace.student-overview-page .client-profile-panel .section-heading { margin: 0 0 8px; }
 .workspace.student-overview-page .section-heading h2 { font-size: 16px; }
 .workspace.student-overview-page .student-progress-card { min-height: 90px; padding: 8px 10px; }

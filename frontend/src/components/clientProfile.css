@@ -1,0 +1,50 @@
+/* One shared visual hierarchy for overview, assessments and workouts. */
+.app-layout > .workspace.client-profile-page {
+  --section-gap: 10px;
+  padding: 12px 24px;
+}
+.workspace.client-profile-page .client-editor-card { padding: 0; }
+.workspace.client-profile-page .back-link { margin: 0 0 8px; font-size: 12px; }
+.workspace.client-profile-page .client-data-header { padding: 0 0 10px; margin: 0; }
+.workspace.client-profile-page .client-data-top { display: flex; align-items: flex-start; gap: 14px; }
+.workspace.client-profile-page .client-data-avatar { width: 52px; height: 52px; flex: 0 0 52px; font-size: 20px; }
+.workspace.client-profile-page .client-data-identity { display: flex; flex: 1; flex-direction: column; justify-content: center; min-width: 0; }
+.workspace.client-profile-page .client-data-identity h1 { display: flex; align-items: center; min-height: 52px; margin: 0; padding: 0; font-size: 26px; font-weight: 750; line-height: 1.1; letter-spacing: -.5px; }
+.workspace.client-profile-page .client-data-tags { margin-top: 2px; gap: 6px 10px; font-size: 12px; line-height: 1.3; }
+.workspace.client-profile-page .client-data-details { margin: 10px 0 0; gap: 6px 18px; }
+.workspace.client-profile-page .client-data-details dt { margin-bottom: 2px; font-size: 11px; }
+.workspace.client-profile-page .client-data-details dd { margin: 0; font-size: 12px; }
+.workspace.client-profile-page .client-data-top > .button { margin-top: 9px; min-height: 34px; min-width: 0; font-size: 12px; }
+.workspace.client-profile-page .profile-tabs { margin: 0 0 12px; }
+.workspace.client-profile-page .profile-tab { min-height: 38px; font-size: 13px; }
+.workspace.client-profile-page .client-profile-panel > .section-heading,
+.workspace.client-profile-page .workout-client-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 12px; }
+.workspace.client-profile-page .client-profile-panel > .section-heading > h2,
+.workspace.client-profile-page .workout-client-heading h1 { margin: 0; color: var(--wine); font-size: 25px; font-weight: 750; line-height: 1.2; letter-spacing: -.4px; }
+.workspace.client-profile-page .student-evolution-section > h2 { font-size: 19px; font-weight: 700; }
+.workspace.client-profile-page .student-overview-panel h2,
+.workspace.client-profile-page .evolution-chart header h3,
+.workspace.client-profile-page .assessment-measurement-heading h3 { font-weight: 700; }
+.workspace.client-profile-page .assessment-measurement-heading h3 { font-size: 18px; color: var(--wine); }
+.workspace.client-profile-page .student-overview-panel h2 { font-size: 16px; }
+.workspace.client-profile-page .evolution-chart header h3 { font-size: 15px; }
+.workspace.client-profile-page .assessment-measurement-list { padding: 10px 12px; border: 1px solid #eee4e8; border-radius: 10px; background: #fff; }
+.workspace.client-profile-page .assessment-measurement-columns { padding: 6px 8px; border-radius: 5px; background: #f5eff2; color: #65404f; font-weight: 600; }
+.workspace.client-profile-page .assessment-measurement-field { padding: 2px 8px; border-radius: 5px; }
+.workspace.client-profile-page .assessment-measurement-field:nth-of-type(even) { background: #fcf8fa; }
+.workspace.client-profile-page .assessment-measurement-field > label { color: #45303a; font-weight: 550; }
+.workspace.client-profile-page .assessment-comparison-date { color: #76636d; }
+.workspace.client-profile-page .assessment-guide-column .assessment-observations { color: #593141; font-weight: 600; }
+.workspace.client-profile-page .section-heading > .button { min-height: 34px; font-size: 12px; }
+@media (max-width: 760px) {
+  .app-layout > .workspace.client-profile-page { padding: 10px 12px; }
+  .workspace.client-profile-page .client-data-identity h1 { font-size: 22px; }
+  .workspace.client-profile-page .client-profile-panel > .section-heading > h2,
+  .workspace.client-profile-page .workout-client-heading h1 { font-size: 22px; }
+  .workspace.client-profile-page .assessment-measurement-list { padding: 8px 4px; }
+  .workspace.client-profile-page .assessment-measurement-field { padding: 2px 4px; }
+}
+@container client-editor (max-width: 540px) {
+  .workspace.client-profile-page .client-data-top { flex-wrap: wrap; }
+  .workspace.client-profile-page .client-data-top > .button { width: 100%; }
+}
