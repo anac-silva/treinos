@@ -6,7 +6,7 @@ import { APP_CONFIG, AppConfig } from '../config';
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   constructor(@Inject(APP_CONFIG) config: AppConfig) {
-    super({ adapter: new PrismaPg({ connectionString: config.databaseUrl }, { schema: new URL(config.databaseUrl).searchParams.get('schema') || 'public' }) });
+    super({ adapter: new PrismaPg({ connectionString: config.databaseUrl, max: 5, connectionTimeoutMillis: 10000, idleTimeoutMillis: 10000 }, { schema: new URL(config.databaseUrl).searchParams.get('schema') || 'public' }) });
   }
   async onModuleInit() { await this.$connect(); }
   async onModuleDestroy() { await this.$disconnect(); }

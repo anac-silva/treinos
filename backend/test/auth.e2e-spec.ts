@@ -10,6 +10,8 @@ import { configureApp } from '../src/shared/configure-app';
 import { PrismaService } from '../src/shared/database/prisma.service';
 import { seedAdmin } from '../prisma/seed';
 import { verifyPassword } from '../src/modules/auth/password';
+import { PostgresThrottlerStorage } from '../src/modules/auth/postgres-throttler.storage';
+import { readConfig } from '../src/shared/config';
 
 // Rota de negócio somente no módulo de testes: prova que o guard é global.
 @Controller('protected')
@@ -68,6 +70,14 @@ describe('auth HTTP + PostgreSQL real', () => {
     expect(await verifyPassword(initial, after.passwordHash)).toBe(true);
     await expect(database.user.create({ data: { name: 'Outro', email: 'other@example.test', passwordHash: 'not-a-password', singleton: 2 } })).rejects.toThrow();
   });
+  it('compartilha o limite entre instâncias e serializa tentativas concorrentes', async () => {
+    const first = new PostgresThrottlerStorage(database);
+    const second = new PostgresThrottlerStorage(database);
+    const key = randomUUID();
+    const attempts = await Promise.all(Array.from({ length: 6 }, (_, index) => (index % 2 ? first : second).increment(key, 60000, 5, 60000)));
+    expect(attempts.filter((item) => item.isBlocked)).toHaveLength(1);
+    expect((await second.increment(key, 60000, 5, 60000)).isBlocked).toBe(true);
+  });
   it('rejeita acesso anônimo, campos extras, origem indevida e senha incorreta', async () => {
     await request(app.getHttpServer()).get('/auth/me').expect(401);
     await request(app.getHttpServer()).post('/auth/login').send({ email: admin.ADMIN_EMAIL, password: initial, active: true }).expect(400);
@@ -120,11 +130,18 @@ describe('auth HTTP + PostgreSQL real', () => {
     await login('wrong', '127.0.0.30').expect(429);
   });
   it('produção exige HTTPS e emite cookie Secure com prefixo __Host', async () => {
+    const localUrl = process.env.DATABASE_URL!;
+    const tlsUrl = new URL(localUrl);
+    tlsUrl.searchParams.set('sslmode', 'require');
+    process.env.DATABASE_URL = tlsUrl.toString();
     process.env.NODE_ENV = 'production';
     process.env.CORS_ORIGINS = 'https://personal.example';
     let productionApp: NestExpressApplication | undefined;
     try {
-      const module = await Test.createTestingModule({ imports: [AppModule] }).compile();
+      // Exercise production HTTP settings against the isolated local test database.
+      const module = await Test.createTestingModule({ imports: [AppModule] }).overrideProvider(PrismaService).useFactory({
+        factory: () => new PrismaService(readConfig({ ...process.env, NODE_ENV: 'test', DATABASE_URL: localUrl, CORS_ORIGINS: 'http://localhost:5173' })),
+      }).compile();
       productionApp = module.createNestApplication<NestExpressApplication>({ bodyParser: false });
       productionApp.useLogger(false);
       configureApp(productionApp);
@@ -140,6 +157,7 @@ describe('auth HTTP + PostgreSQL real', () => {
     } finally {
       if (productionApp) await productionApp.close();
       process.env.NODE_ENV = 'test';
+      process.env.DATABASE_URL = localUrl;
       process.env.CORS_ORIGINS = 'http://localhost:5173';
     }
   });

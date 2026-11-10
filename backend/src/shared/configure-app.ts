@@ -39,7 +39,7 @@ export function configureApp(app: NestExpressApplication) {
     }
     next();
   });
-  app.enableCors({ origin: config.origins, credentials: true, methods: ['GET', 'POST', 'PATCH', 'OPTIONS'], allowedHeaders: ['Content-Type', 'X-CSRF-Token'] });
+  app.enableCors({ origin: config.origins, credentials: true, methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'], allowedHeaders: ['Content-Type', 'X-CSRF-Token'] });
   app.use(json({ limit: '16kb' }));
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true,
     validationError: { target: false, value: false }, forbidUnknownValues: true }));

@@ -1,7 +1,7 @@
 ﻿import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { FiArrowLeft, FiCamera } from 'react-icons/fi';
-import { api } from '../lib/api';
+import { api, photosEnabled } from '../lib/api';
 import { useRemote } from '../lib/useRemote';
 import './clientForm.css';
 import ClientTabs from '../components/clientTabs';
@@ -52,7 +52,7 @@ function Form({ client }) {
   return <main className="workspace client-editor-page"><div className="client-editor-card">
     <Link to="/clientes" className="back-link"><FiArrowLeft aria-hidden="true" />Voltar para Alunos</Link>
     <header className="new-client-heading"><div><h1>{preRegistered ? 'Completar cadastro' : client ? 'Editar aluno' : 'Novo Aluno'}</h1><p>{preRegistered ? 'Complete os dados para tornar este contato um aluno ou mantenha o pré-cadastro.' : client ? 'Atualize os dados do aluno.' : 'Preencha os dados para cadastrar um novo aluno.'}</p></div>
-      <label className="client-photo-picker"><span className="client-photo-circle">{preview ? <img src={preview} alt="Prévia da foto selecionada" /> : <FiCamera aria-hidden="true" />}</span><span>{photo ? 'Trocar foto' : 'Adicionar foto'}</span><input className="sr-only" type="file" accept="image/jpeg,image/png,image/webp" disabled={busy} onChange={selectPhoto} /></label>
+      {photosEnabled && <label className="client-photo-picker"><span className="client-photo-circle">{preview ? <img src={preview} alt="Prévia da foto selecionada" /> : <FiCamera aria-hidden="true" />}</span><span>{photo ? 'Trocar foto' : 'Adicionar foto'}</span><input className="sr-only" type="file" accept="image/jpeg,image/png,image/webp" disabled={busy} onChange={selectPhoto} /></label>}
     </header>
     {error && <p role="alert" className="catalog-error">{error}</p>}
     {client && <ClientTabs />}

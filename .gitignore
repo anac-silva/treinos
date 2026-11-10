@@ -2,6 +2,10 @@ node_modules/
 .env
 .env.*
 !.env.example
+!frontend/.env.production
+!backend/.env.production.example
+.vercel/
+.deployment/
 backend/dist/
 backend/src/generated/
 backend/coverage/

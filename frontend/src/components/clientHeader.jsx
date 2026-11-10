@@ -2,6 +2,7 @@
 import { FiArrowLeft, FiEdit2 } from 'react-icons/fi';
 import { useRemote } from '../lib/useRemote';
 import './clientHeader.css';
+import { photosEnabled } from '../lib/api';
 
 function ClientPhoto({ id, name, initials }) {
   const { data } = useRemote(`/clients/${id}/photo`);
@@ -18,7 +19,7 @@ export default function ClientHeader({ client }) {
   return <>
     <Link to="/clientes" className="back-link"><FiArrowLeft aria-hidden="true" />Voltar para Alunos</Link>
     <header className="client-data-header">
-      <div className="client-data-top"><div className="client-data-avatar">{client.photos?.length ? <ClientPhoto id={client.id} name={client.name} initials={initials} /> : <span aria-hidden="true">{initials}</span>}</div>
+      <div className="client-data-top"><div className="client-data-avatar">{photosEnabled && client.photos?.length ? <ClientPhoto id={client.id} name={client.name} initials={initials} /> : <span aria-hidden="true">{initials}</span>}</div>
         <div className="client-data-identity"><h1>{client.name}</h1><div className="client-data-tags">{client.age != null && <span>{client.age} anos</span>}{client.goal && <span>{client.goal}</span>}<span className={'status ' + (client.status === 'ACTIVE' ? 'status-done' : client.status === 'PRE_REGISTERED' ? 'status-booked' : 'status-pending')}>{client.status === 'ACTIVE' ? 'Ativo' : client.status === 'PRE_REGISTERED' ? 'Pré-cadastro' : 'Inativo'}</span></div></div>
         <Link to={`/clientes/${client.id}/editar`} className="button button-outline"><FiEdit2 aria-hidden="true" />Editar aluno</Link>
       </div>

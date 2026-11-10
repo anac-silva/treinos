@@ -13,6 +13,14 @@ model AppSettings {
   assessmentIntervalDays Int @default(90)
 }
 
+model ThrottleBucket {
+  key String @id @db.VarChar(128)
+  hits Int
+  expiresAt DateTime @db.Timestamptz(3)
+  blockedUntil DateTime? @db.Timestamptz(3)
+  @@index([expiresAt])
+}
+
 model User {
   id                 String    @id @default(uuid()) @db.Uuid
   singleton          Int       @unique @default(1) @db.SmallInt

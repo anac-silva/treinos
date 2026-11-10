@@ -5,9 +5,16 @@ import { UsersModule } from '../users/users.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { SessionGuard } from './session.guard';
+import { DatabaseModule } from '../../shared/database/database.module';
+import { PostgresThrottlerStorage } from './postgres-throttler.storage';
+import { PrismaService } from '../../shared/database/prisma.service';
 
 @Module({
-  imports: [UsersModule, ThrottlerModule.forRoot([{ name: 'default', ttl: 60_000, limit: 120 }])],
+  imports: [UsersModule, ThrottlerModule.forRootAsync({
+    imports: [DatabaseModule],
+    inject: [PrismaService],
+    useFactory: (database: PrismaService) => ({ storage: new PostgresThrottlerStorage(database), throttlers: [{ name: 'default', ttl: 60_000, limit: 120 }] }),
+  })],
   controllers: [AuthController],
   providers: [AuthService, { provide: APP_GUARD, useClass: ThrottlerGuard }, { provide: APP_GUARD, useClass: SessionGuard }],
 })

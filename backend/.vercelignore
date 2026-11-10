@@ -1,0 +1,10 @@
+node_modules
+dist
+.env
+.env.*
+.local-postgres
+.local-photos
+.test-postgres
+coverage
+test
+.git

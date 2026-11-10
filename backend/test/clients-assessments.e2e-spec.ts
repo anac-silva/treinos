@@ -459,7 +459,10 @@ describe('clients, assessments, measurements e photos HTTP + PostgreSQL', () => 
     const png = await sharp({ create: { width: 3, height: 3, channels: 3, background: '#ffffff' } }).png().toBuffer();
     const previous = (await get(`/clients/${clientId}/photo`).expect(200)).body.id as string;
     const objectCount = files.size;
-    const transaction = jest.spyOn(database, '$transaction').mockRejectedValueOnce(new Error('Falha simulada no banco'));
+    const originalTransaction = database.$transaction.bind(database);
+    const transaction = jest.spyOn(database, '$transaction')
+      .mockImplementationOnce(originalTransaction) // Shared rate limiter runs before the upload transaction.
+      .mockRejectedValueOnce(new Error('Falha simulada no banco'));
     try { await upload(png).expect(500); }
     finally { transaction.mockRestore(); }
     expect(storage.remove).toHaveBeenCalledTimes(1);

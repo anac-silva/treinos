@@ -1,6 +1,7 @@
 let csrfToken;
 const base = (import.meta.env?.VITE_API_URL || '/api').replace(/\/$/, '');
-export const localAuthBypass = import.meta.env?.VITE_LOCAL_AUTH_BYPASS === 'true';
+export const localAuthBypass = import.meta.env?.DEV && import.meta.env?.VITE_LOCAL_AUTH_BYPASS === 'true';
+export const photosEnabled = import.meta.env?.VITE_PHOTOS_ENABLED !== 'false';
 export function setCsrfToken(value) { csrfToken = value; }
 
 function waitForRetry(milliseconds, signal) {

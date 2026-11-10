@@ -10,6 +10,8 @@ export function readConfig(env: NodeJS.ProcessEnv = process.env) {
   const localAuthBypass = env.LOCAL_AUTH_BYPASS === 'true';
   if (localAuthBypass && (production || env.NODE_ENV === 'test')) throw new Error('LOCAL_AUTH_BYPASS só pode ser usado em desenvolvimento local.');
   if (!env.DATABASE_URL || !/^postgres(ql)?:\/\//.test(env.DATABASE_URL)) throw new Error('Configure DATABASE_URL para PostgreSQL.');
+  const databaseUrl = new URL(env.DATABASE_URL);
+  if (production && !['require', 'verify-ca', 'verify-full'].includes(databaseUrl.searchParams.get('sslmode') || '')) throw new Error('DATABASE_URL deve exigir TLS em produção (sslmode=require ou verify-full).');
   const origins = (env.CORS_ORIGINS || '').split(',').map((value) => value.trim()).filter(Boolean);
   if (!origins.length) throw new Error('Configure CORS_ORIGINS explicitamente.');
   for (const origin of origins) {
@@ -24,6 +26,7 @@ export function readConfig(env: NodeJS.ProcessEnv = process.env) {
   if (trustProxy === 'true') throw new Error('TRUST_PROXY deve ser false ou uma lista explícita de proxies/IPs confiáveis.');
   return { production, localAuthBypass, port, origins, sessionTtlHours, databaseUrl: env.DATABASE_URL,
     cookieName: production ? '__Host-personal_session' : 'personal_session',
-    trustProxy: trustProxy === 'false' ? false as const : trustProxy.split(',').map((value) => value.trim()),
+    // Vercel overwrites forwarded headers at its ingress. Trust only the immediate hop there.
+    trustProxy: env.VERCEL === '1' ? ((_ip: string, hop: number) => hop === 0) : trustProxy === 'false' ? false as const : trustProxy.split(',').map((value) => value.trim()),
   };
 }
