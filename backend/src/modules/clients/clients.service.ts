@@ -48,9 +48,25 @@ export class ClientsService {
     const { page, pageSize, q, status, goal } = query;
     const where: Prisma.ClientWhereInput = { status, goal: goal ? { contains: goal, mode: 'insensitive' } : undefined,
       OR: q ? ['name', 'email', 'phone'].map((key) => ({ [key]: { contains: q, mode: 'insensitive' } })) : undefined };
+    const mode = query.assessmentFilter;
+    if (mode === 'none') where.assessments = { none: {} };
+    else if (mode) {
+      let days = query.assessmentDays;
+      if (mode === 'overdue') {
+        const settings = await this.database.appSettings.findUnique({ where: { id: 1 } });
+        days = (settings?.assessmentIntervalDays ?? 90) + 1;
+      }
+      if (days === undefined) throw new BadRequestException('Informe a quantidade de dias desde a última avaliação.');
+      const today = new Intl.DateTimeFormat('sv-SE', { timeZone: 'America/Sao_Paulo' }).format(new Date());
+      const cutoff = new Date(Date.parse(today) - days * 86400000);
+      // Match the latest assessment, never an older reading of an otherwise recent client.
+      if (mode === 'atLeast' || mode === 'overdue') where.assessments = { some: {}, none: { assessedOn: { gt: cutoff } } };
+      else if (mode === 'atMost') where.assessments = { some: { assessedOn: { gte: cutoff } } };
+      else where.assessments = { some: { assessedOn: cutoff }, none: { assessedOn: { gt: cutoff } } };
+    }
     const [items, total] = await this.database.$transaction([
       this.database.client.findMany({ where, orderBy: [{ name: 'asc' }, { id: 'asc' }], skip: (page - 1) * pageSize, take: pageSize,
-        include: { photos: { where: { principal: true }, select: { id: true, mimeType: true } } } }),
+        include: { _count: { select: { assessments: true } }, assessments: { orderBy: [{ assessedOn: 'desc' }, { createdAt: 'desc' }, { id: 'desc' }], take: 1, select: { assessedOn: true } }, photos: { where: { principal: true }, select: { id: true, mimeType: true } } } }),
       this.database.client.count({ where }),
     ]);
     return { items, total, page, pageSize };

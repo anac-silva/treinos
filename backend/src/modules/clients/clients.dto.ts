@@ -32,6 +32,10 @@ export class UpdateClientDto extends CreateClientDto {
 }
 
 export class ListClientsDto extends SearchDto {
+  @IsOptional() @IsIn(['atLeast', 'atMost', 'exactly', 'none', 'overdue'])
+  assessmentFilter?: 'atLeast' | 'atMost' | 'exactly' | 'none' | 'overdue';
+  @IsOptional() @Transform(({ value }: { value: unknown }) => Number(value)) @IsInt() @Min(0) @Max(36500)
+  assessmentDays?: number;
   @IsOptional() @IsEnum(ClientStatus)
   status?: ClientStatus;
   @IsOptional() @Trim() @IsString() @MaxLength(100)

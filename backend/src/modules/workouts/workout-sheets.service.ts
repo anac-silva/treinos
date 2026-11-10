@@ -5,7 +5,7 @@ import { CreateWorkoutSheetDto, ListWorkoutsDto } from './workouts.dto';
 import { workoutInclude } from './workouts.shared';
 
 const sheetInclude = {
-  client: { select: { id: true, name: true, status: true } },
+  client: { select: { id: true, name: true, status: true, assessments: { orderBy: [{ assessedOn: 'desc' as const }, { createdAt: 'desc' as const }, { id: 'desc' as const }], take: 1, select: { nextAssessmentOn: true } } } },
   sourceSheet: { select: { id: true, title: true } },
   blocks: { include: workoutInclude, orderBy: { position: 'asc' as const } },
 };

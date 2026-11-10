@@ -1,0 +1,17 @@
+.student-overview-panels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 24px; }
+.student-overview-panel { min-width: 0; padding: 16px; border: 1px solid #ece7e9; border-radius: 12px; background: linear-gradient(130deg, #fff, #fdfafb); box-shadow: 0 1px 3px #40132206; }
+.client-profile-panel .student-overview-panel h2 { display: flex; align-items: center; gap: 12px; margin: 0 0 12px; color: #4d1020; font-size: 17px; font-weight: 750; }
+.student-overview-panel h2 svg { flex: 0 0 24px; width: 24px; height: 24px; color: #ff1741; }
+.student-workout-summary { display: grid; gap: 5px; margin: 0; }
+.student-workout-summary > div { display: grid; grid-template-columns: 1.1fr 1fr; gap: 12px; padding: 6px 10px; border-radius: 7px; font-size: 12px; }
+.student-workout-summary > div:nth-child(odd) { background: #f8f6f7; }
+.student-workout-summary dt { display: flex; align-items: center; gap: 14px; }
+.student-workout-summary dt svg { flex: 0 0 17px; width: 17px; height: 17px; color: #ff1741; }
+.student-workout-summary dd { margin: 0; font-weight: 650; overflow-wrap: anywhere; }
+.student-attention-panel { background: linear-gradient(120deg, #fff9fa, #fff0f4); border-color: #f3e0e6; }
+.student-attention-list { display: grid; gap: 8px; padding: 0; margin: 0; list-style: none; }
+.student-attention-list li { display: flex; align-items: flex-start; gap: 12px; padding: 9px 12px; border-radius: 7px; background: #fff7fa; font-size: 12px; line-height: 1.5; }
+.student-attention-list svg { flex: 0 0 17px; width: 17px; height: 17px; margin-top: 1px; color: #ed3457; }
+.student-attention-list .success svg { color: #009d29; }
+.student-overview-panel > p { color: var(--muted); font-size: 12px; }
+@container client-editor (max-width: 700px) { .student-overview-panels { grid-template-columns: minmax(0, 1fr); } }

@@ -1,19 +1,20 @@
 import { useState } from 'react';
-import { FiCopy } from 'react-icons/fi';
+import { FiDownload } from 'react-icons/fi';
+import { exportWorkoutPdf } from '../../lib/exportWorkoutPdf';
 import { blockLetter, workoutLevels } from '../../lib/workoutSheets';
 import ExerciseList from './exerciseList';
 const levelName = (value) => workoutLevels.find((level) => level.value === value)?.label || value;
 const dateLabel = (value) => new Intl.DateTimeFormat('pt-BR', { dateStyle: 'medium', timeZone: 'America/Sao_Paulo' }).format(new Date(value));
 
-export default function SheetCard({ sheet, onCopy, onAdjust, onTemplate }) {
+export default function SheetCard({ sheet, onAdjust, onTemplate }) {
   const [active, setActive] = useState(0);
   const block = sheet.blocks[active];
   return <article className="settings-section sheet-card">
-    <div className="section-heading"><div><h2>{sheet.title}</h2><p>{sheet.blocks.length} treino(s) · {dateLabel(sheet.createdAt)}{sheet.client && ` · ${sheet.client.name}`}</p></div><div className="sheet-toolbar">
+    <div className="section-heading"><div><h2>{sheet.title}</h2><p>{sheet.blocks.length} treino(s){sheet.client && ` · ${sheet.client.name}`}</p><p className="sheet-validity"><span><strong>Criado em:</strong> {dateLabel(sheet.createdAt)}</span><span><strong>Válido até:</strong> {sheet.client ? (sheet.client.assessments?.[0]?.nextAssessmentOn ? sheet.client.assessments[0].nextAssessmentOn.slice(0, 10).split('-').reverse().join('/') : 'Próxima avaliação não agendada') : 'Definido ao atribuir ao aluno'}</span></p></div><div className="sheet-toolbar">
+      <button type="button" className="button button-outline workout-action-copy" onClick={() => exportWorkoutPdf(sheet)}><FiDownload />Exportar PDF</button>
       {sheet.isActive && <span className="status status-done">Ficha atual</span>}
-      {onAdjust && <button type="button" className="button button-outline" onClick={() => onAdjust(sheet)}>Ajustar ficha</button>}
-      {onCopy && <button type="button" className="button button-outline" onClick={() => onCopy(sheet)}><FiCopy />Copiar ficha</button>}
-      {onTemplate && <button type="button" className="button button-outline" onClick={() => onTemplate(sheet)}>Salvar como modelo</button>}
+      {onAdjust && <button type="button" className="button button-outline workout-action-edit" onClick={() => onAdjust(sheet)}>Ajustar ficha</button>}
+      {onTemplate && <button type="button" className="button button-outline workout-action-template" onClick={() => onTemplate(sheet)}>Salvar como modelo</button>}
     </div></div>
     {sheet.notes && <p className="workout-readable-notes">{sheet.notes}</p>}
     <div className="sheet-block-tabs" role="group" aria-label={`Treinos de ${sheet.title}`}>{sheet.blocks.map((item, index) => <button type="button" aria-pressed={active === index} className={active === index ? 'selected' : ''} key={item.id} onClick={() => setActive(index)}>Treino {blockLetter(index)}<small>{item.title}</small></button>)}</div>

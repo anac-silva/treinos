@@ -1,0 +1,24 @@
+.student-progress { margin: 0 0 24px; }
+.student-progress-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.student-progress-card { display: flex; align-items: flex-start; gap: 12px; min-width: 0; min-height: 108px; padding: 16px 14px; border: 1px solid #ece7e9; border-radius: 12px; background: linear-gradient(130deg, #fff, #fdfafb); box-shadow: 0 1px 3px #40132206; }
+.student-progress-icon { display: grid; place-items: center; flex: 0 0 38px; height: 38px; border-radius: 10px; color: #ff1741; background: #fff0f3; }
+.student-progress-icon svg { width: 24px; height: 24px; }
+.student-progress-card h3 { margin: 1px 0 5px; color: #30272b; font-size: 12px; font-weight: 500; }
+.student-progress-card .student-progress-value { margin: 0; color: #4d1020; font-size: clamp(20px, 2.1vw, 28px); font-weight: 800; line-height: 1.2; letter-spacing: -.6px; }
+.student-progress-card.decrease .student-progress-value { color: #009d29; }
+.student-progress-card.increase .student-progress-value { color: #805b18; }
+.student-progress-badge { display: inline-flex; align-items: center; gap: 3px; margin-top: 5px; padding: 2px 8px; border-radius: 20px; background: #dcfce3; color: #008923; font-size: 11px; font-weight: 600; }
+.student-progress-card.increase .student-progress-badge { background: #fff3d6; color: #805b18; }
+.student-progress-card.stable .student-progress-badge { background: #f0edf0; color: #655b60; }
+.student-progress-note { margin: 8px 0 0; color: var(--muted); font-size: 11px; }
+.student-progress-detail { margin: 5px 0; color: var(--muted); font-size: 11px; line-height: 1.4; }
+.student-progress-initial { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin-top: 7px; color: var(--muted); font-size: 11px; line-height: 1.4; }
+.student-progress-total { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 600; line-height: 1.4; }
+.student-progress-total.decrease { color: #008923; }
+.student-progress-total.increase { color: #805b18; }
+@container client-editor (max-width: 760px) { .student-progress-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container client-editor (max-width: 340px) { .student-progress-grid { grid-template-columns: minmax(0, 1fr); } }
+.student-progress-value-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.student-weight-total { display: inline-flex; align-items: center; gap: 3px; padding: 4px 7px; border-radius: 8px; color: #008923; background: #dcfce3; font-size: 12px; font-weight: 700; }
+.student-weight-total small { display: block; font-size: 9px; font-weight: 500; }
+.student-weight-total.increase { color: #805b18; background: #fff3d6; }

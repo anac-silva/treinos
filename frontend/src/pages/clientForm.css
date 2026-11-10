@@ -98,7 +98,12 @@
 .client-editor-card .assessment-measurement-field { display: grid; grid-template-columns: minmax(0, 1fr) minmax(90px, 120px); align-items: center; gap: 12px; margin-bottom: 10px; }
 .assessment-measurement-field span { overflow-wrap: anywhere; }
 .client-editor-card .assessment-measurement-comparison,
-.assessment-measurement-columns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(65px, 100px) minmax(80px, 120px); align-items: center; gap: 12px; }
+.assessment-measurement-columns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(55px, 80px) minmax(70px, 110px) minmax(65px, 85px); align-items: center; gap: 10px; }
+.assessment-measurement-difference { color: #2563eb; font-weight: 600; font-size: 12px; overflow-wrap: anywhere; }
+@container client-editor (max-width: 440px) {
+  .client-editor-card .assessment-measurement-comparison, .assessment-measurement-columns { grid-template-columns: minmax(0, 1fr) 48px 65px 58px; gap: 6px; font-size: 11px; }
+  .assessment-measurement-difference { font-size: 11px; }
+}
 .assessment-measurement-columns { margin-bottom: 10px; color: var(--muted); font-size: 11px; }
 .assessment-comparison-date { margin: -6px 0 16px; color: var(--muted); font-size: 12px; }
 .assessment-previous-value { color: var(--muted); font-variant-numeric: tabular-nums; }
@@ -154,3 +159,42 @@
   .client-editor-card .client-edit-fields textarea { height: 70px; min-height: 70px; }
   .client-editor-card .client-edit-fields .form-actions { padding-top: 14px; margin-top: 0; }
 }
+
+/* Compact student overview; retain natural scrolling on smaller screens. */
+.workspace.student-overview-page { padding: 12px 18px; }
+.student-overview-page .client-editor-card { max-width: none; padding: 16px 20px; }
+.student-overview-page .back-link { margin-bottom: 8px; }
+.student-overview-page .client-data-header { padding-bottom: 10px; margin-bottom: 8px; }
+.student-overview-page .client-data-avatar { width: 44px; height: 44px; flex-basis: 44px; font-size: 18px; }
+.student-overview-page .client-data-identity h1 { font-size: 23px; }
+.student-overview-page .client-data-tags { margin-top: 3px; }
+.student-overview-page .client-data-details { margin-top: 8px; gap: 6px 16px; }
+.student-overview-page .profile-tabs { margin-bottom: 8px; }
+.student-overview-page .section-heading { margin: 8px 0; }
+.student-overview-page .section-heading h2 { font-size: 17px; }
+.student-overview-page .button { min-height: 34px; min-width: 0; font-size: 12px; }
+.student-overview-page .student-progress { margin-bottom: 10px; }
+.student-overview-page .student-progress-card { min-height: 88px; padding: 10px; gap: 8px; }
+.student-overview-page .student-progress-icon { flex-basis: 30px; height: 30px; }
+.student-overview-page .student-progress-value { font-size: 25px; }
+.student-overview-page .student-progress-note { font-size: 10px; margin-top: 4px; }
+.student-overview-page .settings-section { margin-top: 8px; padding: 10px 12px; }
+.student-overview-page .settings-section > h2 { margin-bottom: 6px; font-size: 16px; }
+.student-overview-page .catalog-form { margin-bottom: 8px; gap: 10px; }
+.student-overview-page .catalog-form .field { gap: 3px; font-size: 11px; }
+.student-overview-page .catalog-form input { height: 32px; }
+.student-overview-page .evolution-charts { gap: 12px; }
+.student-overview-page .evolution-chart { padding: 8px; }
+.student-overview-page .evolution-chart svg { height: clamp(110px, 19vh, 180px); }
+.student-overview-page .evolution-chart header { margin-bottom: 0; }
+.student-overview-page .evolution-chart header h3 { font-size: 13px; }
+.student-overview-page .evolution-point-info { margin: 0 0 4px; min-height: 14px; font-size: 10px; }
+.student-overview-page .evolution-legend { gap: 4px; }
+.student-overview-page .evolution-legend button { padding: 3px 6px; font-size: 10px; }
+.student-overview-page .student-overview-panels { margin: 10px 0 0; gap: 12px; }
+.student-overview-page .student-overview-panel { padding: 10px 12px; }
+.student-overview-page .student-overview-panel h2 { margin-bottom: 6px; font-size: 14px; }
+.student-overview-page .student-workout-summary > div { padding: 4px 8px; font-size: 11px; }
+.student-overview-page .student-attention-list { gap: 5px; }
+.student-overview-page .student-attention-list li { padding: 6px 8px; font-size: 11px; }
+@media (max-width: 760px) { .workspace.student-overview-page { padding: 10px; } .student-overview-page .client-editor-card { padding: 12px; } }

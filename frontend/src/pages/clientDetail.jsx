@@ -1,5 +1,7 @@
 ﻿import EvolutionChart from '../components/evolutionChart';
 import { evolutionSeries } from '../lib/evolution';
+import StudentProgressCards from '../components/studentProgressCards';
+import StudentOverviewPanels from '../components/studentOverviewPanels';
 import ClientPanel from '../components/clientPanel';
 import ClientHeader from '../components/clientHeader';
 import { useState } from 'react';
@@ -60,7 +62,7 @@ function Evolution({ id }) {
     event.preventDefault(); const values = Object.fromEntries(new FormData(event.currentTarget));
     setRange(new URLSearchParams(Object.fromEntries(Object.entries(values).filter(([, value]) => value))).toString());
   }
-  return <section className="settings-section"><h2>Evolução</h2><form className="catalog-form" onSubmit={filter}><label className="field">De<input name="from" type="date" /></label><label className="field">Até<input name="to" type="date" /></label><button className="button button-outline">Filtrar</button></form><EvolutionData key={range} id={id} range={range} /></section>;
+  return <section className="settings-section student-evolution-section"><h2>Evolução</h2><form className="catalog-form" onSubmit={filter}><label className="field">De<input name="from" type="date" /></label><label className="field">Até<input name="to" type="date" /></label><button className="button button-outline">Filtrar</button></form><EvolutionData key={range} id={id} range={range} /></section>;
 }
 function EvolutionData({ id, range }) {
   const weight = useRemote(`/clients/${id}/assessments/weight-evolution?${range}`);
@@ -81,10 +83,10 @@ export default function ClientDetail({ mode }) {
   const { data: client, loading, error } = useRemote(`/clients/${clientId}`);
   if (loading) return <main className="workspace" role="status">Carregando aluno…</main>;
   if (error) return <main className="workspace"><p role="alert">{error}</p><Link to="/clientes">Voltar para alunos</Link></main>;
-  return <ClientPanel><ClientHeader client={client} /><ClientTabs />
+  return <ClientPanel className={mode === 'overview' ? 'student-overview-page' : ''}><ClientHeader client={client} /><ClientTabs />
     {mode === 'history' && <History id={clientId} />}
     {mode === 'overview' && <div className="section-heading"><h2>Evolução do aluno</h2><Link className="button button-primary" to={`/clientes/${clientId}/medidas`}>Nova medição</Link></div>}
-    {mode === 'overview' && <Evolution id={clientId} />}
+    {mode === 'overview' && <><StudentProgressCards id={clientId} /><Evolution id={clientId} /><StudentOverviewPanels client={client} /></>}
   </ClientPanel>;
 }
 

@@ -8,6 +8,7 @@ import { useCatalog } from '../contexts/catalogContext';
 import { api } from '../lib/api';
 import { useRemote } from '../lib/useRemote';
 import { useAuth } from '../contexts/authContext';
+import { assessmentInterval, nextAssessmentDate } from '../lib/assessmentSchedule';
 import { assessmentDraftKey, readAssessmentDraft, writeAssessmentDraft, removeAssessmentDraft, clearBodyMeasurements } from '../lib/assessmentDraft';
 
 function draftStorage() {
@@ -42,6 +43,15 @@ function AssessmentEditor({ client, assessment, previous, previousLoading, previ
   }
   function change(event) {
     const { name, value } = event.target;
+    if (name === 'assessmentDays') {
+      persist({ ...draft.values, nextAssessmentOn: nextAssessmentDate(draft.values.assessedOn, value) });
+      return;
+    }
+    if (name === 'assessedOn') {
+      const days = assessmentInterval(draft.values.assessedOn, draft.values.nextAssessmentOn);
+      persist({ ...draft.values, assessedOn: value, nextAssessmentOn: nextAssessmentDate(value, days) });
+      return;
+    }
     if (name) persist({ ...draft.values, [name]: value });
   }
   function clearMeasurements() {
@@ -68,30 +78,37 @@ function AssessmentEditor({ client, assessment, previous, previousLoading, previ
     {draft.message && <p className={draft.failed ? 'catalog-error' : 'assessment-draft-status'} role={draft.failed ? 'alert' : 'status'}>{draft.message}</p>}
     {loading ? <p role="status">Carregando catálogo…</p> : <form className="form-layout client-form-layout" onSubmit={submit} onInvalid={(event) => setError(event.target.name === 'weightKg' ? 'Informe um peso válido para salvar a avaliação.' : 'Confira os campos obrigatórios e os valores informados.')}>
       <label className="field">Data<input name="assessedOn" type="date" required value={draft.values.assessedOn} onChange={change} /></label>
-      <label className="field">Peso (kg) *<input name="weightKg" type="number" min="0.001" max="9999.999" step="0.001" required value={draft.values.weightKg} onChange={change} /></label>
+      <label className="field">Próxima avaliação em (dias)<input name="assessmentDays" type="number" min="0" max="3650" step="1" placeholder="Ex.: 90" value={assessmentInterval(draft.values.assessedOn, draft.values.nextAssessmentOn)} onChange={change} /></label>
       <label className="field">Próxima avaliação (prevista)<input name="nextAssessmentOn" type="date" value={draft.values.nextAssessmentOn} onChange={change} title="Gera uma previsão na agenda, que poderá ser alterada, cancelada ou confirmada." /></label>
       <section className="full-field assessment-measurements" aria-labelledby="assessment-measurements-title">
-        <BodyMeasurementGuide sex={client.sex} />
+        <div className="assessment-guide-column">
+          <BodyMeasurementGuide sex={client.sex} />
+          <label className="field assessment-observations">Observações<textarea name="notes" maxLength={5000} value={draft.values.notes} onChange={change} /></label>
+        </div>
         <div className="assessment-measurement-list">
           <div className="assessment-measurement-heading"><h3 id="assessment-measurements-title">Medidas corporais</h3><button type="button" className="button button-outline" disabled={busy || !types.length} onClick={clearMeasurements}>Limpar medidas corporais</button></div>
           {!assessment && <>
             {previousLoading && <p role="status">Carregando última medição…</p>}
             {previousError && <p role="alert" className="catalog-error">Não foi possível carregar a última medição: {previousError}</p>}
             {!previousLoading && !previousError && <p className="assessment-comparison-date">{previous ? `Última medição: ${previous.assessedOn.slice(0, 10).split('-').reverse().join('/')}` : 'Nenhuma medição anterior registrada.'}</p>}
-            <div className="assessment-measurement-columns" aria-hidden="true"><span>Local</span><span>Anterior</span><span>Nova medida</span></div>
+            <div className="assessment-measurement-columns" aria-hidden="true"><span>Medida</span><span>Anterior</span><span>Nova medida</span><span>Diferença</span></div>
           </>}
-          {types.map((type) => {
-            const last = previous?.measurements.find((m) => m.typeId === type.id);
+          {[{ id: 'weightKg', name: 'Peso', unit: 'kg', isWeight: true }, ...types].map((type) => {
+            const fieldName = type.isWeight ? 'weightKg' : `measure-${type.id}`;
+            const last = type.isWeight ? (previous?.weightKg != null ? { value: previous.weightKg, unit: 'kg' } : null) : previous?.measurements.find((m) => m.typeId === type.id);
+            const current = draft.values[fieldName];
+            const comparable = !previousLoading && !previousError && last && last.unit === type.unit && current != null && current !== '' && Number.isFinite(Number(current));
+            const difference = comparable ? Number((Number(current) - Number(last.value)).toFixed(3)) : null;
             return <div className={`field assessment-measurement-field${!assessment ? ' assessment-measurement-comparison' : ''}`} key={type.id}>
-              <label htmlFor={`measure-${type.id}`}>{type.name} ({type.unit})</label>
+              <label htmlFor={`measure-${type.id}`}>{type.name} ({type.unit}){type.isWeight ? ' *' : ''}</label>
               {!assessment && <span className="assessment-previous-value" aria-label={`Última medição de ${type.name}`}>{previousLoading ? '…' : last ? `${new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 3 }).format(Number(last.value))} ${last.unit}` : '—'}</span>}
-              <input id={`measure-${type.id}`} name={`measure-${type.id}`} type="number" min="0" max="9999999.999" step="0.001" placeholder="—" value={draft.values[`measure-${type.id}`] ?? ''} onChange={change} />
+              <input id={`measure-${type.id}`} name={fieldName} type="number" min={type.isWeight ? '0.001' : '0'} max={type.isWeight ? '9999.999' : '9999999.999'} step="0.001" required={Boolean(type.isWeight)} placeholder="—" value={current ?? ''} onChange={change} />
+              {!assessment && <output className="assessment-measurement-difference" htmlFor={`measure-${type.id}`} aria-label={`Diferença de ${type.name}`}>{difference == null ? '—' : `${difference > 0 ? '+' : ''}${new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 3 }).format(difference)} ${type.unit}`}</output>}
             </div>;
           })}
           {!types.length && <p className="catalog-empty">Sem tipos de medição cadastrados. Você pode registrar somente o peso ou cadastrar tipos em Configurações.</p>}
         </div>
       </section>
-      <label className="field full-field">Observações<textarea name="notes" maxLength={5000} value={draft.values.notes} onChange={change} /></label>
       {assessment && <label className="field full-field">Motivo da correção<textarea name="reason" required maxLength={500} value={draft.values.reason} onChange={change} /></label>}
       <div className="form-actions full-field"><Link className="button button-outline" to={`/clientes/${client.id}/visaogeral`}>Cancelar</Link><button disabled={busy || Boolean(catalogError)} className="button button-primary">{busy ? 'Salvando…' : assessment ? 'Salvar correção' : 'Salvar medição'}</button></div>
     </form>}

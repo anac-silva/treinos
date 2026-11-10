@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/authContext';
+import { localAuthBypass } from '../lib/api';
 
 export default function AuthPage({ change = false }) {
   const auth = useAuth();
@@ -9,6 +10,7 @@ export default function AuthPage({ change = false }) {
   const [success, setSuccess] = useState('');
   if (auth.loading) return <main className="workspace" role="status">Verificando sessão…</main>;
   if (!change && auth.user) return <Navigate to={auth.user.mustChangePassword ? '/alterar-senha' : '/'} replace />;
+  if (localAuthBypass && !auth.user) return <main className="workspace auth-page"><h1>Acesso local ao Treinos</h1><p>O acesso neste computador é automático, sem e-mail ou senha.</p>{auth.error && <p role="alert" className="catalog-error">{auth.error}</p>}<button type="button" className="button button-primary" onClick={() => window.location.reload()}>Tentar novamente</button></main>;
   async function submit(event) {
     event.preventDefault();
     const values = Object.fromEntries(new FormData(event.currentTarget));

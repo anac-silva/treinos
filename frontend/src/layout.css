@@ -168,3 +168,125 @@
   .workspace .form-actions { flex-direction: column-reverse; }
   .workspace .form-actions .button { width: 100%; }
 }
+
+/* Keep the assessment image, notes and measurements together in a compact form. */
+.workspace.assessment-editor-page { padding: 10px 18px; }
+.assessment-editor-page .client-editor-card { max-width: none; padding: 14px 20px; }
+.assessment-editor-page .back-link { margin-bottom: 6px; }
+.assessment-editor-page .client-data-header { padding-bottom: 8px; margin-bottom: 6px; }
+.assessment-editor-page .client-data-avatar { width: 44px; height: 44px; flex-basis: 44px; font-size: 18px; }
+.assessment-editor-page .client-data-identity h1 { font-size: 23px; }
+.assessment-editor-page .client-data-tags { margin-top: 3px; }
+.assessment-editor-page .client-data-details { margin-top: 7px; }
+.assessment-editor-page .client-editor-card .profile-tabs { margin-bottom: 8px; }
+.assessment-editor-page .profile-tab { min-height: 36px; }
+.assessment-editor-page .client-profile-panel > h2 { font-size: 19px; margin-bottom: 6px; }
+.assessment-editor-page .assessment-draft-status { margin: 4px 0 8px; font-size: 11px; }
+.assessment-editor-page .client-editor-card .client-form-layout { row-gap: 10px; }
+.assessment-editor-page .field { gap: 4px; font-size: 12px; }
+.assessment-editor-page .client-editor-card .field input { height: 34px; }
+.assessment-editor-page .assessment-measurements { grid-template-columns: minmax(220px, .8fr) minmax(0, 1.4fr); gap: 24px; padding-top: 0; }
+.assessment-guide-column { display: grid; gap: 10px; min-width: 0; }
+.assessment-editor-page .assessment-body-image { width: auto; max-width: 100%; height: clamp(240px, 37vh, 350px); max-height: none; }
+.assessment-editor-page .assessment-body-guide { padding: 0; }
+.assessment-editor-page .assessment-body-guide figcaption { margin-top: 0; font-size: 10px; }
+.assessment-editor-page .assessment-guide-column .assessment-observations { display: grid; width: 100%; }
+.workspace.assessment-editor-page .assessment-guide-column textarea[name="notes"] { height: 64px; min-height: 48px; }
+.assessment-editor-page .assessment-measurement-heading { margin-bottom: 8px; }
+.assessment-editor-page .assessment-measurement-heading h3 { font-size: 15px; }
+.assessment-editor-page .assessment-comparison-date { margin-bottom: 8px; font-size: 11px; }
+.assessment-editor-page .assessment-measurement-columns { margin-bottom: 6px; }
+.assessment-editor-page .client-editor-card .assessment-measurement-field { margin-bottom: 5px; }
+.assessment-editor-page .client-editor-card .assessment-measurement-field input { height: 30px; font-size: 12px; }
+.assessment-editor-page .client-editor-card .form-actions { padding-top: 8px; margin-top: 0; }
+.assessment-editor-page .client-editor-card .button { min-height: 34px; font-size: 12px; }
+@media (max-width: 760px) {
+  .workspace.assessment-editor-page { padding: 10px; }
+  .assessment-editor-page .client-editor-card { padding: 12px; }
+  .assessment-editor-page .assessment-measurements { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .assessment-editor-page .assessment-body-image { height: 270px; }
+}
+
+/* Overview overrides follow the shared layout rules to avoid restoring large spacing. */
+.app-layout > .workspace.student-overview-page { --section-gap: 8px; padding: 10px 24px; }
+.workspace.student-overview-page .client-editor-card { padding: 0; }
+.workspace.student-overview-page .back-link { margin-bottom: 6px; }
+.workspace.student-overview-page .client-data-header { padding-bottom: 8px; }
+.workspace.student-overview-page .client-data-avatar { width: 40px; height: 40px; flex-basis: 40px; font-size: 16px; }
+.workspace.student-overview-page .client-data-identity h1 { font-size: 22px; }
+.workspace.student-overview-page .client-data-details { margin-top: 6px; gap: 4px 16px; }
+.workspace.student-overview-page .client-data-details dd { font-size: 12px; }
+.workspace.student-overview-page .profile-tabs { margin-bottom: 8px; }
+.workspace.student-overview-page .profile-tab { min-height: 34px; }
+.workspace.student-overview-page .client-profile-panel .section-heading { margin: 0 0 8px; }
+.workspace.student-overview-page .section-heading h2 { font-size: 16px; }
+.workspace.student-overview-page .student-progress-card { min-height: 90px; padding: 8px 10px; }
+.workspace.student-overview-page .student-progress-value { font-size: 24px; }
+.workspace.student-overview-page .student-progress-detail { margin: 3px 0 0; }
+.workspace.student-overview-page .student-progress { margin-bottom: 8px; }
+.workspace.student-overview-page .student-progress-note { margin-top: 3px; font-size: 9px; }
+.workspace.student-overview-page .client-profile-panel > .student-evolution-section { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 6px 12px; padding: 8px 10px; margin: 0 0 8px; }
+.workspace.student-overview-page .student-evolution-section > h2 { margin: 0; font-size: 16px; }
+.workspace.student-overview-page .student-evolution-section > .catalog-form { margin: 0; gap: 8px; }
+.workspace.student-overview-page .student-evolution-section .catalog-form .field { flex: 0 1 150px; gap: 2px; }
+.workspace.student-overview-page .student-evolution-section input { height: 30px; font-size: 11px; }
+.workspace.student-overview-page .student-evolution-section > .evolution-charts { grid-column: 1 / -1; }
+.workspace.student-overview-page .evolution-chart { padding: 6px 8px; }
+.workspace.student-overview-page .evolution-chart header h3 { margin: 0; font-size: 13px; }
+.workspace.student-overview-page .evolution-chart svg { width: 100%; height: clamp(110px, 21vh, 190px); }
+.workspace.student-overview-page .evolution-point-info { margin: 0 0 3px; min-height: 12px; font-size: 10px; }
+.workspace.student-overview-page .evolution-legend button { padding: 2px 6px; font-size: 10px; }
+.workspace.student-overview-page .student-overview-panels { margin: 0; }
+.workspace.student-overview-page .student-overview-panel { padding: 8px 10px; }
+.workspace.student-overview-page .student-overview-panel h2 { margin: 0 0 5px; font-size: 14px; }
+.workspace.student-overview-page .student-workout-summary { gap: 3px; }
+.workspace.student-overview-page .student-workout-summary > div { padding: 3px 8px; }
+.workspace.student-overview-page .student-attention-list li { padding: 5px 8px; }
+@media (max-width: 760px) {
+  .app-layout > .workspace.student-overview-page { padding: 10px 12px; }
+  .workspace.student-overview-page .client-profile-panel > .student-evolution-section { grid-template-columns: minmax(0, 1fr); }
+  .workspace.student-overview-page .student-evolution-section .catalog-form { flex-wrap: wrap; }
+}
+
+/* Compact workout rows with every prescription visible together. */
+.workspace.workout-page .workout-exercise-list { display: grid; gap: 6px; }
+.workspace.workout-page .workout-exercise-card { display: grid; grid-template-columns: minmax(180px, 2fr) minmax(55px, .45fr) minmax(75px, .6fr) minmax(80px, .65fr) minmax(110px, 1fr) auto; align-items: end; gap: 10px; padding: 10px; border: 1px solid #e9e2e5; border-radius: 8px; background: #fff; }
+.workspace.workout-page .workout-exercise-card:nth-child(even) { background: #faf8fa; }
+.workspace.workout-page .workout-exercise-card > header { display: block; min-width: 0; margin: 0; }
+.workspace.workout-page .workout-exercise-fields { display: contents; }
+.workspace.workout-page .workout-exercise-card .field { min-width: 0; gap: 4px; font-size: 11px; }
+.workspace.workout-page .workout-exercise-card :is(input, select) { width: 100%; min-width: 0; height: 34px; padding: 5px 8px; font-size: 12px; }
+.workspace.workout-page .workout-exercise-card .workout-row-tools { height: 34px; flex-wrap: nowrap; gap: 4px; }
+.workspace.workout-page .workout-move-actions { flex-wrap: nowrap; }
+.workspace.workout-page .workout-move-actions .icon-button { background: #edf3ff; color: #2555a4; border-radius: 6px; }
+.workspace.workout-page .workout-remove-exercise { background: #fff0f2; color: #c82342; border-radius: 6px; width: 30px; height: 30px; }
+.workspace.workout-page .icon-button:disabled { opacity: .35; cursor: default; }
+.workspace.workout-page .sheet-block-tabs { margin-bottom: 10px; gap: 6px; }
+.workspace.workout-page .sheet-block-tabs > button { flex: 0 1 auto; min-width: 150px; padding: 7px 12px; background: #f6f3f5; }
+.workspace.workout-page .sheet-block-tabs > button.selected { color: #fff; background: #650e28; border-color: #650e28; box-shadow: none; }
+.workspace.workout-page .sheet-block-tabs > button.selected small { color: #f6dfe6; }
+.workspace.workout-page .sheet-block-editor { padding: 12px; }
+.workspace.workout-page .sheet-block-heading { margin-bottom: 10px; }
+.workspace.workout-page .block-fields { gap: 10px; }
+.workspace.workout-page .sheet-toolbar .button { min-height: 36px; padding: 6px 12px; font-size: 12px; }
+.workspace.workout-page .sheet-exercises li { display: grid; grid-template-columns: minmax(160px, 1.2fr) minmax(220px, 1fr) minmax(0, 1fr); align-items: center; gap: 12px; padding: 8px; }
+.workspace.workout-page .sheet-exercises li:nth-child(odd) { background: #faf7f8; }
+.workspace.workout-page .sheet-exercises li span, .workspace.workout-page .sheet-exercises li small { margin: 0; }
+@media (max-width: 1000px) {
+  .workspace.workout-page .workout-exercise-card { grid-template-columns: minmax(160px, 2fr) 58px 75px 80px minmax(90px, 1fr) auto; gap: 6px; }
+  .workspace.workout-page .sheet-exercises li { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .workspace.workout-page .sheet-exercises li small { grid-column: 1 / -1; }
+}
+@media (max-width: 760px) {
+  .workspace.workout-page .workout-exercise-card { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .workspace.workout-page .workout-exercise-card > header { grid-column: 1 / -1; }
+  .workspace.workout-page .workout-exercise-card .workout-exercise-fields > .field:last-child { grid-column: span 2; }
+  .workspace.workout-page .workout-row-tools { justify-content: end; }
+  .workspace.workout-page .sheet-exercises li { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+}
+.workspace.workout-page .button.workout-action-new { color: #fff; background: #16744e; border-color: #16744e; }
+.workspace.workout-page .button.workout-action-template { color: #54308e; background: #f1eafa; border-color: #d8c8ef; }
+.workspace.workout-page .button.workout-action-edit { color: #fff; background: #650e28; border-color: #650e28; }
+.workspace.workout-page .button.workout-action-copy { color: #2256a3; background: #edf3ff; border-color: #c8daf7; }
+.workspace.workout-page .button.workout-action-remove { color: #b91c3a; background: #fff0f3; border-color: #f1c4cf; }
+.workspace.workout-page .button:disabled { opacity: .45; cursor: default; }

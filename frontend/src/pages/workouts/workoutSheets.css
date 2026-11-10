@@ -48,3 +48,5 @@
   .sheet-block-tabs > button { flex-basis: 100px; padding: 8px 10px; }
   .template-result { align-items: stretch; flex-direction: column; gap: 10px; }
 }
+.sheet-validity { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 12px; color: var(--muted); }
+.sheet-validity strong { color: var(--wine); font-weight: 600; }

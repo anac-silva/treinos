@@ -1,4 +1,5 @@
 import LegacyCatalogImport from './legacyCatalogImport';
+import AssessmentSettings from './assessmentSettings';
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FiPlus, FiSearch } from "react-icons/fi";
@@ -56,6 +57,7 @@ export default function Configuracoes() {
       <header className="page-heading"><div><h1>Configurações</h1><p>Organize os exercícios e as medições usados nos atendimentos.</p></div></header>
       <p className="notice-banner">Exercícios e medições são salvos no servidor e ficam disponíveis para os treinos e avaliações.</p>
       <LegacyCatalogImport />
+      <AssessmentSettings />
       <CatalogSection kind="exercises" title="Exercícios" description="Cadastre os exercícios disponíveis para seleção nos treinos." />
       <CatalogSection kind="measurements" title="Medições" description="Defina o que será medido e a unidade de cada medição." withUnit />
       <div className="settings-links"><Link className="button button-outline" to="/clientes">Selecionar aluno para avaliação</Link></div>
